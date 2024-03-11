@@ -5,6 +5,18 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "67a99e3f-77af-4316-9a92-ec86620da8da"
+      }
+    },
+    "owner": "barkinb",
+    "android": {
+      "package": "com.barkinb.coilcrypt"
+    },
+    "ios": {
+      "bundleIdentifier": "com.barkinb.coilcrypt"
+    }
   }
 }
