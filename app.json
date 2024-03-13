@@ -2,13 +2,16 @@
   "expo": {
     "name": "coilcrypt",
     "slug": "coilcrypt",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "assetBundlePatterns": [
       "**/*"
     ],
     "extra": {
       "eas": {
         "projectId": "67a99e3f-77af-4316-9a92-ec86620da8da"
+      },
+      "react-native-screens": {
+        "enableScreens": true
       }
     },
     "owner": "barkinb",

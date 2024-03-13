@@ -53,3 +53,4 @@ buck-out/
 .expo/
 web-build/
 dist/
+%ProgramData%/Microsoft/Windows/UUS/State/_active.uusver

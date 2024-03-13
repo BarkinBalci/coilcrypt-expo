@@ -9,7 +9,6 @@ export const buttonStyles: StyleSheet.NamedStyles<any> = {
     alignItems: 'center',
     marginHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: colors.purple,
   },
   text: {
     color: colors.white,
