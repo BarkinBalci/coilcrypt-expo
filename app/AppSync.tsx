@@ -1,15 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { useApp, useAuth, useQuery, useRealm, useUser } from "@realm/react";
-import { Pressable, StyleSheet, Text } from "react-native";
-import { MD3DarkTheme, MD3LightTheme, PaperProvider, BottomNavigation, Searchbar, Appbar, Title, Paragraph, useTheme, Surface } from "react-native-paper";
+import { Pressable, StyleSheet } from "react-native";
+import {
+  MD3DarkTheme,
+  MD3LightTheme,
+  PaperProvider,
+  BottomNavigation,
+  Searchbar,
+  Appbar,
+  Title,
+  Paragraph,
+  useTheme,
+  Surface,
+  Subheading,
+  FAB,
+  Divider,
+  Text,
+  IconButton,
+} from "react-native-paper";
 import BottomNavigator from "./components/BottomNavigator";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { enableScreens } from "react-native-screens";
 import { Login } from "./models/Login";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
 import { useColorScheme } from "react-native";
 import { AddLoginScreen } from "./components/LoginManager";
+import ItemDetailsScreen from "./components/ItemDetails";
 
 enableScreens();
 
@@ -22,19 +39,6 @@ const SearchScreen: React.FC = () => {
     </Surface>
   );
 };
-
-function ItemDetailsScreen({ route }) {
-  const { login } = route.params;
-
-  return (
-    <Surface style={{ paddingTop: 20, paddingHorizontal: 20, flex: 1 }}>
-      <Title>{login.name}</Title>
-      <Paragraph>{login.url}</Paragraph>
-      <Paragraph>{login.username}</Paragraph>
-      <Paragraph>{login.password}</Paragraph>
-    </Surface>
-  );
-}
 
 function AddNoteScreen() {
   return (
@@ -106,55 +110,75 @@ export const AppSync: React.FC = () => {
           name="View Item"
           component={ItemDetailsScreen}
           options={{
-            header: () => (
-              <Appbar.Header>
-                <Appbar.Content title="View Item" />
-              </Appbar.Header>
-            ),
+            header: () => {
+              const navigation = useNavigation();
+              return (
+                <Appbar.Header>
+                  <Appbar.BackAction onPress={() => navigation.goBack()} />
+                  <Appbar.Content title="View Item" />
+                </Appbar.Header>
+              );
+            },
           }}
         />
         <Stack.Screen
           name="Add Login"
           component={AddLoginScreen}
           options={{
-            header: () => (
-              <Appbar.Header>
-                <Appbar.Content title="Add Login" />
-              </Appbar.Header>
-            ),
+            header: () => {
+              const navigation = useNavigation();
+              return (
+                <Appbar.Header>
+                  <Appbar.BackAction onPress={() => navigation.goBack()} />
+                  <Appbar.Content title="Add Login" />
+                </Appbar.Header>
+              );
+            },
           }}
         />
         <Stack.Screen
           name="Add Note"
           component={AddNoteScreen}
           options={{
-            header: () => (
-              <Appbar.Header>
-                <Appbar.Content title="Add Note" />
-              </Appbar.Header>
-            ),
+            header: () => {
+              const navigation = useNavigation();
+              return (
+                <Appbar.Header>
+                  <Appbar.BackAction onPress={() => navigation.goBack()} />
+                  <Appbar.Content title="Add Note" />
+                </Appbar.Header>
+              );
+            },
           }}
         />
         <Stack.Screen
           name="Add Card"
           component={AddCardScreen}
           options={{
-            header: () => (
-              <Appbar.Header>
-                <Appbar.Content title="Add Card" />
-              </Appbar.Header>
-            ),
+            header: () => {
+              const navigation = useNavigation();
+              return (
+                <Appbar.Header>
+                  <Appbar.BackAction onPress={() => navigation.goBack()} />
+                  <Appbar.Content title="Add Card" />
+                </Appbar.Header>
+              );
+            },
           }}
         />
         <Stack.Screen
           name="Add Identity"
           component={AddIdentityScreen}
           options={{
-            header: () => (
-              <Appbar.Header>
-                <Appbar.Content title="Add Identity" />
-              </Appbar.Header>
-            ),
+            header: () => {
+              const navigation = useNavigation();
+              return (
+                <Appbar.Header>
+                  <Appbar.BackAction onPress={() => navigation.goBack()} />
+                  <Appbar.Content title="Add Identity" />
+                </Appbar.Header>
+              );
+            },
           }}
         />
       </Stack.Navigator>

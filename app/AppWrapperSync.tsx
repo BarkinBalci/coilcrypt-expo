@@ -18,7 +18,7 @@ export const AppWrapperSync: React.FC<{
   const paperTheme = colorScheme === "dark" ? { ...MD3DarkTheme, colors: theme.dark } : { ...MD3LightTheme, colors: theme.light };
   return (
     <PaperProvider theme={paperTheme}>
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ backgroundColor: colors.background, flex: 1 }}>
         <AppProvider id={appId}>
           <UserProvider fallback={<LoginScreen />}>
             <RealmProvider

@@ -62,6 +62,7 @@ export const LoginList: React.FC<LoginListProps> = ({ logins, onDeleteLogin }) =
         renderSectionHeader={renderSectionHeader}
         keyExtractor={(login) => login._id.toString()}
         style={styles.listContainer}
+        showsVerticalScrollIndicator={false}
       />
     </Surface>
   );
