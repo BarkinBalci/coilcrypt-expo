@@ -5,6 +5,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { shadows } from "../styles/shadows";
 import colors from "../styles/colors";
 import { Login } from "../models/Login";
+import { Surface } from "react-native-paper";
 
 type LoginItemProps = {
   login: Login & Realm.Object;
@@ -14,19 +15,19 @@ type LoginItemProps = {
 
 export const LoginItem = React.memo<LoginItemProps>(({ login, onToggleStatus, onDelete }) => {
   return (
-    <View>
+    <Surface>
       <Pressable onPress={onToggleStatus} style={[styles.status, login.favorite && styles.completed]}>
         <Text style={styles.icon}>{login.favorite ? "✓" : "○"}</Text>
       </Pressable>
-      <View style={styles.descriptionContainer}>
+      <Surface style={styles.descriptionContainer}>
         <Text numberOfLines={1} style={styles.description}>
           {login.url}
         </Text>
-      </View>
+      </Surface>
       <Pressable onPress={onDelete} style={styles.deleteButton}>
         <Text style={styles.deleteText}>Delete</Text>
       </Pressable>
-    </View>
+    </Surface>
   );
 });
 

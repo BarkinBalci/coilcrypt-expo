@@ -1,16 +1,13 @@
 import React from "react";
-import { View } from "react-native";
-import { Appbar, Text } from "react-native-paper";
+import { Appbar, Surface, Text } from "react-native-paper";
 
 export default function Share() {
   return (
-    <View>
+    <Surface style={{ flex: 1 }}>
       <Appbar.Header>
         <Appbar.Content title="Share" />
       </Appbar.Header>
-      <View style={{ padding: 20 }}>
-        <Text>Share!</Text>
-      </View>
-    </View>
+        <Text style={{ padding: 20 }}>Share!</Text>
+    </Surface>
   );
 }

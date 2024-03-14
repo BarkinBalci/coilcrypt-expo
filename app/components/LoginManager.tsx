@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
-import { View, StyleSheet } from "react-native";
-import { Button, TextInput, Provider as PaperProvider } from "react-native-paper";
+import { StyleSheet } from "react-native";
+import { Button, TextInput, Provider as PaperProvider, Surface } from "react-native-paper";
 
 import { Login } from "../models/Login";
 import { useRealm } from "@realm/react";
@@ -43,7 +43,7 @@ export const AddLoginScreen: React.FC<{
   }, [realm, userId, navigation, url, name, username, password]);
 
   return (
-    <View style={styles.content}>
+    <Surface style={styles.content}>
       <TextInput label="Name" value={name} onChangeText={setTitle} />
       <TextInput label="URL" value={url} onChangeText={setDescription} />
       <TextInput label="Username" value={username} onChangeText={setUsername} />
@@ -51,7 +51,7 @@ export const AddLoginScreen: React.FC<{
       <Button style={styles.button} mode="contained" onPress={handleAddLogin}>
         Add Login
       </Button>
-    </View>
+    </Surface>
   );
 };
 

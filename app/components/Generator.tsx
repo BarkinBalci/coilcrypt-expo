@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, Switch } from "react-native";
-import { Appbar, Button } from "react-native-paper";
+import { View, Switch } from "react-native";
+import { Appbar, Button, Surface, Text } from "react-native-paper";
 import Slider from "@react-native-community/slider";
 
 export default function Generator() {
@@ -14,38 +14,30 @@ export default function Generator() {
   };
 
   return (
-    <View>
+    <Surface elevation={0} style={{ flex: 1 }}>
       <Appbar.Header>
         <Appbar.Content title="Generator" />
       </Appbar.Header>
-      <View style={{ padding: 20 }}>
+      <Surface style={{ padding: 20, flex: 1 }}>
         <Text>Password Length: {passwordLength}</Text>
         <Slider value={passwordLength} onValueChange={setPasswordLength} minimumValue={8} maximumValue={32} step={1} />
 
-        <View>
-          <Text>Include Special Characters?</Text>
-          <Switch value={includeSpecials} onValueChange={setIncludeSpecials} />
-        </View>
+        <Text>Include Special Characters?</Text>
+        <Switch value={includeSpecials} onValueChange={setIncludeSpecials} />
 
-        <View>
-          <Text>Include Uppercase Letters?</Text>
-          <Switch value={includeUppercase} onValueChange={setIncludeUppercase} />
-        </View>
+        <Text>Include Uppercase Letters?</Text>
+        <Switch value={includeUppercase} onValueChange={setIncludeUppercase} />
 
-        <View>
-          <Text>Include Lowercase Letters?</Text>
-          <Switch value={includeUppercase} onValueChange={setIncludeUppercase} />
-        </View>
+        <Text>Include Lowercase Letters?</Text>
+        <Switch value={includeUppercase} onValueChange={setIncludeUppercase} />
 
-        <View>
-          <Text>Include Numbers?</Text>
-          <Switch value={includeNumbers} onValueChange={setIncludeNumbers} />
-        </View>
+        <Text>Include Numbers?</Text>
+        <Switch value={includeNumbers} onValueChange={setIncludeNumbers} />
 
-        <Button mode="contained" onPress={generatePassword}>
+        <Button mode="contained" onPress={generatePassword} style={{ marginTop: 20 }}>
           Generate Password
         </Button>
-      </View>
-    </View>
+      </Surface>
+    </Surface>
   );
 }

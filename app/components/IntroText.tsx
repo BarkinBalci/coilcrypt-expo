@@ -1,11 +1,11 @@
 import React from "react";
-import { Paragraph, Button } from "react-native-paper";
+import { Paragraph, Button, Surface } from "react-native-paper";
 import { View, Text, Pressable, StyleSheet, Linking } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export const IntroText = () => {
   return (
-    <View style={styles.content}>
+    <Surface style={styles.content}>
       <Paragraph style={styles.paragraph}>Welcome to CoilCrypt</Paragraph>
       <Paragraph style={styles.paragraph}>You can start by adding a login using the button at the bottom right of the screen.</Paragraph>
       <Button
@@ -16,7 +16,7 @@ export const IntroText = () => {
       >
         GitHub
       </Button>
-    </View>
+    </Surface>
   );
 };
 

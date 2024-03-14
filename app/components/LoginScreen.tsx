@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { Card, TextInput, Button, Text, MD3DarkTheme, MD3LightTheme, PaperProvider } from "react-native-paper";
+import { StyleSheet } from "react-native";
+import { Card, TextInput, Button, Text, MD3DarkTheme, MD3LightTheme, PaperProvider, Surface } from "react-native-paper";
 import { AuthOperationName, useAuth, useEmailPasswordAuth } from "@realm/react";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
 import { useColorScheme } from "react-native";
@@ -22,9 +22,8 @@ export const LoginScreen = () => {
   }, [result, logInWithEmailPassword, email, password]);
 
   return (
-    <PaperProvider theme={paperTheme}>
-      <View style={[styles.content, { backgroundColor: backgroundColor }]}>
-        <Card style={[styles.card]}>
+      <Surface style={[styles.content]}>
+        <Card mode="contained" style={[styles.card]}>
           <Card.Content>
             <TextInput
               label="Email"
@@ -61,8 +60,7 @@ export const LoginScreen = () => {
             </Button>
           </Card.Content>
         </Card>
-      </View>
-    </PaperProvider>
+      </Surface>
   );
 };
 
