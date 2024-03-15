@@ -70,8 +70,6 @@ function AddIdentityScreen() {
 export const AppSync: React.FC = () => {
   const realm = useRealm();
   const colorScheme = useColorScheme();
-  const { theme } = useMaterial3Theme();
-  const paperTheme = colorScheme === "dark" ? { ...MD3DarkTheme, colors: theme.dark } : { ...MD3LightTheme, colors: theme.light };
   const [showDone, setShowDone] = useState(false);
   const logins = useQuery(Login, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")), [
     showDone,
@@ -83,7 +81,7 @@ export const AppSync: React.FC = () => {
     });
   }, [realm, logins]);
 
-  const MyTheme = {
+  const Theme = {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
@@ -92,7 +90,7 @@ export const AppSync: React.FC = () => {
   };
 
   return (
-    <NavigationContainer theme={MyTheme}>
+    <NavigationContainer theme={Theme}>
       <Stack.Navigator>
         <Stack.Screen name="Main" component={BottomNavigator} options={{ headerShown: false }} />
         <Stack.Screen
