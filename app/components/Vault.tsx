@@ -3,10 +3,11 @@ import { Appbar, Text, FAB } from "react-native-paper";
 import { Login } from "../models/Login";
 import { useQuery, useUser } from "@realm/react";
 import { useState } from "react";
-import LoginList from "./LoginList";
+import ItemList from "./ItemList";
 import { useRealm } from "@realm/react";
 import { IntroText } from "./IntroText";
 import { useNavigation } from "@react-navigation/native";
+import { Note } from "../models/Note";
 
 export default function Vault() {
   const realm = useRealm();
@@ -44,13 +45,10 @@ export default function Vault() {
     [realm]
   );
 
-  const handleDeleteLogin = useCallback(
-    (login: Login & Realm.Object): void => {
+  const handleDeleteItem = useCallback(
+    (item: Realm.Object): void => {
       realm.write(() => {
-        realm.delete(login);
-
-        // Alternatively if passing the ID as the argument to handleDeleteLogin:
-        // realm?.delete(realm?.objectForPrimaryKey('Login', id));
+        realm.delete(item);
       });
     },
     [realm]
@@ -61,6 +59,9 @@ export default function Vault() {
   const logins = useQuery(Login, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")), [
     showDone,
   ]);
+  const notes = useQuery(Note, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")), [
+    showDone,
+  ]);
   return (
     <>
       <Appbar.Header>
@@ -68,7 +69,11 @@ export default function Vault() {
         <Appbar.Action icon="magnify" onPress={_handleSearch} />
         <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
       </Appbar.Header>
-      {logins.length === 0 ? <IntroText /> : <LoginList logins={logins} onToggleLoginStatus={handleToggleLoginStatus} onDeleteLogin={handleDeleteLogin} />}
+      {logins.length === 0 ? (
+        <IntroText />
+      ) : (
+        <ItemList logins={logins} notes={notes} onToggleLoginStatus={handleToggleLoginStatus} onDeleteItem={handleDeleteItem} />
+      )}
       <FAB.Group
         open={open}
         visible

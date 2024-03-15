@@ -7,7 +7,7 @@ export default function Share() {
       <Appbar.Header>
         <Appbar.Content title="Share" />
       </Appbar.Header>
-        <Text style={{ padding: 20 }}>Share!</Text>
+        <Text style={{ paddingHorizontal:20, paddingTop: 10 }}>Share!</Text>
     </Surface>
   );
 }

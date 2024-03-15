@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { View, Switch } from "react-native";
-import { Appbar, Button, Surface, Text } from "react-native-paper";
+import { Appbar, Button, Surface, Text, Switch } from "react-native-paper";
 import Slider from "@react-native-community/slider";
 
 export default function Generator() {
   const [passwordLength, setPasswordLength] = useState(8);
   const [includeSpecials, setIncludeSpecials] = useState(false);
   const [includeUppercase, setIncludeUppercase] = useState(false);
+  const [includeLowercase, setIncludeLowercase] = useState(false);
   const [includeNumbers, setIncludeNumbers] = useState(false);
 
   const generatePassword = () => {
@@ -29,7 +29,7 @@ export default function Generator() {
         <Switch value={includeUppercase} onValueChange={setIncludeUppercase} />
 
         <Text>Include Lowercase Letters?</Text>
-        <Switch value={includeUppercase} onValueChange={setIncludeUppercase} />
+        <Switch value={includeLowercase} onValueChange={setIncludeLowercase} />
 
         <Text>Include Numbers?</Text>
         <Switch value={includeNumbers} onValueChange={setIncludeNumbers} />

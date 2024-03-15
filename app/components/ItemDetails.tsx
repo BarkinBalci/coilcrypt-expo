@@ -29,7 +29,9 @@ export default function ItemDetailsScreen({ route }) {
     <Surface style={styles.surface}>
       <Surface mode="flat" style={styles.surfaceRow}>
         <Surface mode="flat">
-          <Text variant="labelSmall">Name</Text>
+          <Text style={styles.label} variant="labelSmall">
+            Name
+          </Text>
           <Text variant="bodyLarge">{login.name}</Text>
         </Surface>
         <IconButton icon="content-copy" onPress={() => copyToClipboard(login.name)} />
@@ -37,7 +39,9 @@ export default function ItemDetailsScreen({ route }) {
       <Divider />
       <Surface mode="flat" style={styles.surfaceRow}>
         <Surface mode="flat">
-          <Text variant="labelSmall">Username</Text>
+          <Text style={styles.label} variant="labelSmall">
+            Username
+          </Text>
           <Text variant="bodyLarge">{login.username}</Text>
         </Surface>
         <IconButton icon="content-copy" onPress={() => copyToClipboard(login.username)} />
@@ -45,7 +49,9 @@ export default function ItemDetailsScreen({ route }) {
       <Divider />
       <Surface mode="flat" style={styles.surfaceRow}>
         <Surface mode="flat">
-          <Text variant="labelSmall">Password</Text>
+          <Text style={styles.label} variant="labelSmall">
+            Password
+          </Text>
           <Text variant="bodyLarge">{showPassword ? login.password : "••••••••"}</Text>
         </Surface>
         <Surface mode="flat" style={styles.surfaceRow}>
@@ -56,7 +62,9 @@ export default function ItemDetailsScreen({ route }) {
       <Divider />
       <Surface mode="flat" style={styles.surfaceRow}>
         <Surface mode="flat">
-          <Text variant="labelSmall">URL</Text>
+          <Text style={styles.label} variant="labelSmall">
+            URL
+          </Text>
           <Text variant="bodyLarge">{login.url}</Text>
         </Surface>
         <Surface mode="flat" style={styles.surfaceRow}>
@@ -64,8 +72,12 @@ export default function ItemDetailsScreen({ route }) {
           <IconButton icon="content-copy" onPress={() => copyToClipboard(login.url)} />
         </Surface>
       </Surface>
-      <Text variant="labelSmall">Last Updated: {new Date(login.updatedAt).toLocaleString()}</Text>
-      <Text variant="labelSmall">Created: {new Date(login.createdAt).toLocaleString()}</Text>
+      <Text style={styles.label} variant="labelSmall">
+        Last Updated: {new Date(login.updatedAt).toLocaleString()}
+      </Text>
+      <Text style={styles.label} variant="labelSmall">
+        Created: {new Date(login.createdAt).toLocaleString()}
+      </Text>
       <FAB icon="pen" style={styles.fab} onPress={() => console.log("Edit Pressed")} />
     </Surface>
   );
@@ -88,6 +100,9 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  label: {
+    opacity: 0.6,
   },
 
   fab: {

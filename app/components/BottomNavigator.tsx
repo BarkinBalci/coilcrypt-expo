@@ -3,7 +3,6 @@ import { View, StyleSheet, Pressable } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text, BottomNavigation, Appbar, Button, Switch } from "react-native-paper";
-import { buttonStyles } from "../styles/button";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Generator from "./Generator";
 import Share from "./Share";
@@ -105,8 +104,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  authButtonText: {
-    ...buttonStyles.text,
   },
 });
