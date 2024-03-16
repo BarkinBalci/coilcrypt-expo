@@ -7,11 +7,15 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { enableScreens } from "react-native-screens";
 import { Login } from "./models/Login";
 import { Note } from "./models/Note";
+import { Card } from "./models/Card";
+import { Identity } from "./models/Identity";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
 import { useColorScheme } from "react-native";
 import { AddLoginScreen } from "./components/AddLoginScreen";
 import { AddNoteScreen } from "./components/AddNoteScreen";
+import { AddCardScreen } from "./components/AddCardScreen";
 import ItemDetailsScreen from "./components/ItemDetails";
+import { AddIdentityScreen } from "./components/AddIdentityScreen";
 
 enableScreens();
 
@@ -25,37 +29,25 @@ const SearchScreen: React.FC = () => {
   );
 };
 
-function AddCardScreen() {
-  return (
-    <Surface style={{ flex: 1 }}>
-      <Title>Add Card</Title>
-      <Paragraph>Form to add a new card</Paragraph>
-    </Surface>
-  );
-}
-
-function AddIdentityScreen() {
-  return (
-    <Surface style={{ flex: 1 }}>
-      <Title>Add Identity</Title>
-      <Paragraph>Form to add a new identity</Paragraph>
-    </Surface>
-  );
-}
-
 export const App: React.FC = () => {
   const realm = useRealm();
   const colorScheme = useColorScheme();
   const [showDone, setShowDone] = useState(false);
   const logins = useQuery(Login, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")));
   const notes = useQuery(Note, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")));
+  const cards = useQuery(Card, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")));
+  const identities = useQuery(Identity, (collection) =>
+    showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")
+  );
 
   useEffect(() => {
     realm.subscriptions.update((mutableSubs) => {
       mutableSubs.add(logins);
       mutableSubs.add(notes);
+      mutableSubs.add(cards);
+      mutableSubs.add(identities);
     });
-  }, [realm, logins, notes]);
+  }, [realm, logins, notes, cards, identities]);
 
   const Theme = {
     ...DefaultTheme,
@@ -97,36 +89,8 @@ export const App: React.FC = () => {
         />
         <Stack.Screen name="Add Login" component={AddLoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Add Note" component={AddNoteScreen} options={{ headerShown: false }} />
-        <Stack.Screen
-          name="Add Card"
-          component={AddCardScreen}
-          options={{
-            header: () => {
-              const navigation = useNavigation();
-              return (
-                <Appbar.Header>
-                  <Appbar.BackAction onPress={() => navigation.goBack()} />
-                  <Appbar.Content title="Add Card" />
-                </Appbar.Header>
-              );
-            },
-          }}
-        />
-        <Stack.Screen
-          name="Add Identity"
-          component={AddIdentityScreen}
-          options={{
-            header: () => {
-              const navigation = useNavigation();
-              return (
-                <Appbar.Header>
-                  <Appbar.BackAction onPress={() => navigation.goBack()} />
-                  <Appbar.Content title="Add Identity" />
-                </Appbar.Header>
-              );
-            },
-          }}
-        />
+        <Stack.Screen name="Add Card" component={AddCardScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Add Identity" component={AddIdentityScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

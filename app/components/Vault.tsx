@@ -8,6 +8,8 @@ import { useRealm } from "@realm/react";
 import { IntroText } from "./IntroText";
 import { useNavigation } from "@react-navigation/native";
 import { Note } from "../models/Note";
+import { Card } from "../models/Card";
+import { Identity } from "../models/Identity";
 
 export default function Vault() {
   const realm = useRealm();
@@ -54,12 +56,17 @@ export default function Vault() {
     [realm]
   );
 
-  const user = useUser();
   const [showDone, setShowDone] = useState(false);
   const logins = useQuery(Login, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")), [
     showDone,
   ]);
   const notes = useQuery(Note, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")), [
+    showDone,
+  ]);
+  const cards = useQuery(Card, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")), [
+    showDone,
+  ]);
+  const identity = useQuery(Identity, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")), [
     showDone,
   ]);
   return (
@@ -72,7 +79,14 @@ export default function Vault() {
       {logins.length === 0 ? (
         <IntroText />
       ) : (
-        <ItemList logins={logins} notes={notes} onToggleLoginStatus={handleToggleLoginStatus} onDeleteItem={handleDeleteItem} />
+        <ItemList
+          logins={logins}
+          notes={notes}
+          cards={cards}
+          identities={identity}
+          onToggleLoginStatus={handleToggleLoginStatus}
+          onDeleteItem={handleDeleteItem}
+        />
       )}
       <FAB.Group
         open={open}

@@ -3,6 +3,7 @@ import Realm, { BSON } from 'realm';
 export class Note extends Realm.Object {
     _id: BSON.ObjectId = new BSON.ObjectId();
     userId!: string;
+    type: string = 'note';
     
     name!: string;
     content: string;

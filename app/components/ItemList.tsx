@@ -5,16 +5,19 @@ import { Card, Title, Paragraph, IconButton, Avatar, Text, Menu, Surface, Icon }
 import { useNavigation } from "@react-navigation/native";
 import { Login } from "../models/Login";
 import { Note } from "../models/Note";
+import { Card as CardModal } from "../models/Card";
+import { Identity } from "../models/Identity";
 import Clipboard from "@react-native-community/clipboard";
 
 type ItemListProps = {
   logins: Realm.Results<Login>;
   notes: Realm.Results<Note>;
-  onToggleLoginStatus: (login: Login) => void;
+  cards: Realm.Results<CardModal>;
+  identities: Realm.Results<Identity>;
   onDeleteItem: (item: Login | Note) => void;
 };
 
-export const ItemList: React.FC<ItemListProps> = ({ logins, notes, onDeleteItem }) => {
+export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identities, onDeleteItem }) => {
   const navigation = useNavigation();
   const [visible, setVisible] = useState<Record<string, boolean>>({});
   const [selectedItem, setSelectedItem] = useState<Login | Note>();
@@ -36,15 +39,16 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, onDeleteItem 
     closeMenu();
   };
 
-    const handleImageError = (id: string) => { // New function to handle image error
+  const handleImageError = (id: string) => {
+    // New function to handle image error
     setImageError((prevState) => ({ ...prevState, [id]: true }));
   };
 
   const renderItem = ({ item }) => {
-    switch (item.constructor.name) {
-      case "Login":
+    switch (item.type) {
+      case "login":
         return (
-          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { login: item })}>
+          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: item })}>
             <Card.Content>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                 {imageError[item._id] ? (
@@ -75,9 +79,9 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, onDeleteItem 
           </Card>
         );
 
-      case "Note":
+      case "note":
         return (
-          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { note: item })}>
+          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: item })}>
             <Card.Content>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                 {imageError[item._id] ? (
@@ -89,7 +93,65 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, onDeleteItem 
                     onError={() => handleImageError(item._id.toString())} // Call the new function on error
                   />
                 )}
-                <Text style={{ marginLeft: 10, paddingVertical:8, flex: 1 }} variant="titleSmall">
+                <Text style={{ marginLeft: 10, paddingVertical: 8, flex: 1 }} variant="titleSmall">
+                  {item.name}
+                </Text>
+                <Menu
+                  visible={visible[item._id]}
+                  onDismiss={closeMenu}
+                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(item)} size={24} />}
+                >
+                  <Menu.Item onPress={copyPassword} title="Copy" />
+                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
+                </Menu>
+              </View>
+            </Card.Content>
+          </Card>
+        );
+      case "card":
+        return (
+          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: item })}>
+            <Card.Content>
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                {imageError[item._id] ? (
+                  <Icon source="credit-card" size={24} />
+                ) : (
+                  <Image
+                    style={{ width: 24, height: 24 }}
+                    source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${item.url}` }}
+                    onError={() => handleImageError(item._id.toString())} // Call the new function on error
+                  />
+                )}
+                <Text style={{ marginLeft: 10, paddingVertical: 8, flex: 1 }} variant="titleSmall">
+                  {item.name}
+                </Text>
+                <Menu
+                  visible={visible[item._id]}
+                  onDismiss={closeMenu}
+                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(item)} size={24} />}
+                >
+                  <Menu.Item onPress={copyPassword} title="Copy" />
+                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
+                </Menu>
+              </View>
+            </Card.Content>
+          </Card>
+        );
+      case "identity":
+        return (
+          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: item })}>
+            <Card.Content>
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                {imageError[item._id] ? (
+                  <Icon source="account" size={24} />
+                ) : (
+                  <Image
+                    style={{ width: 24, height: 24 }}
+                    source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${item.url}` }}
+                    onError={() => handleImageError(item._id.toString())} // Call the new function on error
+                  />
+                )}
+                <Text style={{ marginLeft: 10, paddingVertical: 8, flex: 1 }} variant="titleSmall">
                   {item.name}
                 </Text>
                 <Menu
@@ -117,6 +179,8 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, onDeleteItem 
         sections={[
           { title: "Credentials", data: Array.from(logins) },
           { title: "Notes", data: Array.from(notes) },
+          { title: "Cards", data: Array.from(cards) },
+          { title: "Identities", data: Array.from(identities) },
         ]}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
