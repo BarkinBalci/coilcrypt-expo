@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import React from "react";
+import { StyleSheet } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text, BottomNavigation, Appbar, Button, Switch } from "react-native-paper";
+import { BottomNavigation } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Generator from "./Generator";
 import Share from "./Share";

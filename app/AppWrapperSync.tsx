@@ -1,12 +1,12 @@
 import React from "react";
 import { AppProvider, UserProvider } from "@realm/react";
-import { SafeAreaView, StyleSheet, View, useColorScheme, StatusBar } from "react-native";
+import { useColorScheme, StatusBar } from "react-native";
 import { schemas } from "./models";
 import { LoginScreen } from "./components/LoginScreen";
 import { App } from "./App";
-import { PaperProvider, useTheme, MD3DarkTheme, MD3LightTheme, MD3Theme } from "react-native-paper";
+import { PaperProvider, MD3DarkTheme, MD3LightTheme } from "react-native-paper";
 import { RealmProvider } from "@realm/react";
-import { OpenRealmBehaviorType, OpenRealmTimeOutBehavior } from "realm";
+import { OpenRealmBehaviorType } from "realm";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
 import * as NavigationBar from "expo-navigation-bar";
 

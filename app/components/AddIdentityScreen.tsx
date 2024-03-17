@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { Button, TextInput, Surface, Appbar } from "react-native-paper";
 import { useRealm, useUser } from "@realm/react";

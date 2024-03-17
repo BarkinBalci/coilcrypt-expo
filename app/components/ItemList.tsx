@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, ScrollView, SectionList, Image } from "react-native";
+import { View, StyleSheet, SectionList, Image } from "react-native";
 import { Realm } from "@realm/react";
-import { Card, Title, Paragraph, IconButton, Avatar, Text, Menu, Surface, Icon } from "react-native-paper";
+import { Card, IconButton, Text, Menu, Surface, Icon } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { Login } from "../models/Login";
 import { Note } from "../models/Note";
@@ -122,9 +122,12 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
                     onError={() => handleImageError(item._id.toString())} // Call the new function on error
                   />
                 )}
-                <Text style={{ marginLeft: 10, paddingVertical: 8, flex: 1 }} variant="titleSmall">
-                  {item.name}
-                </Text>
+                <View style={{ marginLeft: 10, flex: 1 }}>
+                  <Text variant="titleSmall">{item.name}</Text>
+                  <Text style={{ opacity: 0.6 }} variant="bodySmall">
+                    {item.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(item.number.length - 10)).replace(/(.{4})/g, "$1 ")}
+                  </Text>
+                </View>
                 <Menu
                   visible={visible[item._id]}
                   onDismiss={closeMenu}

@@ -2,12 +2,10 @@ import { Divider, FAB, IconButton, Surface, Text } from "react-native-paper";
 import { StyleSheet, Linking } from "react-native";
 import Clipboard from "@react-native-community/clipboard";
 import React, { useState } from "react";
-import { Login } from "../models/Login";
-import { Note } from "../models/Note";
 
 export default function ItemDetailsScreen({ route }) {
   const { item } = route.params;
-  const [showPassword, setShowPassword] = useState(false);
+  const [showField, setVisibility] = useState(false);
   const copyToClipboard = (text) => {
     Clipboard.setString(text);
   };
@@ -22,8 +20,8 @@ export default function ItemDetailsScreen({ route }) {
     });
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const toggleVisibility = () => {
+    setVisibility(!showField);
   };
   switch (item.type) {
     case "login":
@@ -54,10 +52,10 @@ export default function ItemDetailsScreen({ route }) {
               <Text style={styles.label} variant="labelSmall">
                 Password
               </Text>
-              <Text variant="bodyLarge">{showPassword ? item.password : "••••••••"}</Text>
+              <Text variant="bodyLarge">{showField ? item.password : "••••••••"}</Text>
             </Surface>
             <Surface mode="flat" style={styles.surfaceRow}>
-              <IconButton icon={showPassword ? "eye-off" : "eye"} onPress={togglePasswordVisibility} />
+              <IconButton icon={showField ? "eye-off" : "eye"} onPress={toggleVisibility} />
               <IconButton icon="content-copy" onPress={() => copyToClipboard(item.password)} />
             </Surface>
           </Surface>
@@ -162,9 +160,12 @@ export default function ItemDetailsScreen({ route }) {
               <Text style={styles.label} variant="labelSmall">
                 CVV
               </Text>
-              <Text variant="bodyLarge">{item.cvv}</Text>
+              <Text variant="bodyLarge">{showField ? item.cvv : "•••"}</Text>
             </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.cvv)} />
+            <Surface mode="flat" style={styles.surfaceRow}>
+              <IconButton icon={showField ? "eye-off" : "eye"} onPress={toggleVisibility} />
+              <IconButton icon="content-copy" onPress={() => copyToClipboard(item.cvv)} />
+            </Surface>
           </Surface>
           <Text style={styles.label} variant="labelSmall">
             Last Updated: {new Date(item.updatedAt).toLocaleString()}

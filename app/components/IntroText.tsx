@@ -1,6 +1,6 @@
 import React from "react";
 import { Paragraph, Button, Surface } from "react-native-paper";
-import { View, Text, Pressable, StyleSheet, Linking } from "react-native";
+import { StyleSheet, Linking } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 export const IntroText = () => {

@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
-import { Appbar, Text, FAB } from "react-native-paper";
+import { Appbar, FAB } from "react-native-paper";
 import { Login } from "../models/Login";
-import { useQuery, useUser } from "@realm/react";
+import { useQuery } from "@realm/react";
 import { useState } from "react";
 import ItemList from "./ItemList";
 import { useRealm } from "@realm/react";

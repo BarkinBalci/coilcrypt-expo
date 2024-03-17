@@ -1,5 +1,5 @@
 import React from "react";
-import { Appbar, Text, Button, Surface } from "react-native-paper";
+import { Appbar, Button, Surface } from "react-native-paper";
 import { useAuth, useUser } from "@realm/react";
 import { OfflineModeButton } from "./OfflineModeButton";
 

@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { useApp, useAuth, useQuery, useRealm, useUser } from "@realm/react";
-import { Appbar, Title, Paragraph, Surface, Text } from "react-native-paper";
+import { useQuery, useRealm } from "@realm/react";
+import { Appbar, Surface, Text, MD3DarkTheme, MD3LightTheme } from "react-native-paper";
 import BottomNavigator from "./components/BottomNavigator";
 import { NavigationContainer, DefaultTheme, useNavigation } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createStackNavigator, CardStyleInterpolators } from "@react-navigation/stack";
 import { enableScreens } from "react-native-screens";
 import { Login } from "./models/Login";
 import { Note } from "./models/Note";
 import { Card } from "./models/Card";
 import { Identity } from "./models/Identity";
-import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
 import { useColorScheme } from "react-native";
 import { AddLoginScreen } from "./components/AddLoginScreen";
 import { AddNoteScreen } from "./components/AddNoteScreen";
 import { AddCardScreen } from "./components/AddCardScreen";
 import ItemDetailsScreen from "./components/ItemDetails";
 import { AddIdentityScreen } from "./components/AddIdentityScreen";
+import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
 
 enableScreens();
 
@@ -31,7 +31,6 @@ const SearchScreen: React.FC = () => {
 
 export const App: React.FC = () => {
   const realm = useRealm();
-  const colorScheme = useColorScheme();
   const [showDone, setShowDone] = useState(false);
   const logins = useQuery(Login, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")));
   const notes = useQuery(Note, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")));
@@ -39,6 +38,9 @@ export const App: React.FC = () => {
   const identities = useQuery(Identity, (collection) =>
     showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")
   );
+  const { theme } = useMaterial3Theme();
+  const colorScheme = useColorScheme();
+  const paperTheme = colorScheme === "dark" ? { ...MD3DarkTheme, colors: theme.dark } : { ...MD3LightTheme, colors: theme.light };
 
   useEffect(() => {
     realm.subscriptions.update((mutableSubs) => {
@@ -53,13 +55,17 @@ export const App: React.FC = () => {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      background: colorScheme === "dark" ? "black" : "white",
+      background: paperTheme.colors.background,
     },
   };
 
   return (
     <NavigationContainer theme={Theme}>
-      <Stack.Navigator>
+      <Stack.Navigator
+        screenOptions={{
+          cardStyleInterpolator: CardStyleInterpolators.forBottomSheetAndroid,
+        }}
+      >
         <Stack.Screen name="Main" component={BottomNavigator} options={{ headerShown: false }} />
         <Stack.Screen
           name="Search"

@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { StyleSheet } from "react-native";
-import { Button, TextInput, Surface, Appbar } from "react-native-paper";
+import { TextInput, Surface, Appbar } from "react-native-paper";
 import { Card } from "../models/Card";
 import { useRealm, useUser } from "@realm/react";
 
@@ -45,9 +45,9 @@ export const AddCardScreen: React.FC<{
       <Surface style={styles.content}>
         <TextInput mode="outlined" label="Name" value={name} onChangeText={setTitle} />
         <TextInput mode="outlined" label="Owner Name" value={ownerName} onChangeText={setOwnerName} />
-        <TextInput multiline mode="outlined" label="Number" value={number} onChangeText={setNumber} />
+        <TextInput mode="outlined" label="Number" value={number} onChangeText={setNumber} maxLength={16} />
         <TextInput mode="outlined" label="Expiration Date" value={expirationDate} onChangeText={setExpirationDate} />
-        <TextInput multiline mode="outlined" label="CVV" value={cvv} onChangeText={setCvv} />
+        <TextInput multiline mode="outlined" label="CVV" value={cvv} onChangeText={setCvv} maxLength={3} />
       </Surface>
     </Surface>
   );

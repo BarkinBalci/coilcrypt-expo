@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { StyleSheet } from "react-native";
-import { Button, TextInput, Surface, Appbar } from "react-native-paper";
+import { TextInput, Surface, Appbar } from "react-native-paper";
 import { Login } from "../models/Login";
 import { useRealm, useUser } from "@realm/react";
 
