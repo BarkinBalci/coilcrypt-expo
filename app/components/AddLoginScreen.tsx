@@ -3,32 +3,37 @@ import { StyleSheet } from "react-native";
 import { TextInput, Surface, Appbar } from "react-native-paper";
 import { Login } from "../models/Login";
 import { useRealm, useUser } from "@realm/react";
+import { Cryptography } from "../libraries/cryptography";
+import { v4 as uuidv4 } from "uuid";
 
 export const AddLoginScreen: React.FC<{
   navigation: any;
 }> = ({ navigation }) => {
   const realm = useRealm();
   const user = useUser();
-  
+
   const [url, setDescription] = React.useState("");
   const [name, setTitle] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(true);
 
-  const handleAddLogin = useCallback((): void => {
+  const handleAddLogin = useCallback(async (): Promise<void> => {
     if (!url || !name) {
       return;
     }
+    const iv = uuidv4().replace(/-/g, "");
+    const fields = { name, url, username, password };
+    const encryptedFields = {};
 
+    for (const key in fields) {
+      encryptedFields[key] = await Cryptography.encrypt(fields[key], iv);
+    }
     realm.write(() => {
       return realm.create(Login, {
-        name,
-        url,
-        username,
-        password,
-
         userId: user.id,
+        iv,
+        ...encryptedFields,
       });
     });
 

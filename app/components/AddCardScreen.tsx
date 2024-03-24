@@ -3,6 +3,8 @@ import { StyleSheet } from "react-native";
 import { TextInput, Surface, Appbar } from "react-native-paper";
 import { Card } from "../models/Card";
 import { useRealm, useUser } from "@realm/react";
+import { Cryptography } from "../libraries/cryptography";
+import { v4 as uuidv4 } from "uuid";
 
 export const AddCardScreen: React.FC<{
   navigation: any;
@@ -16,19 +18,22 @@ export const AddCardScreen: React.FC<{
   const [expirationDate, setExpirationDate] = React.useState("");
   const [cvv, setCvv] = React.useState("");
 
-  const handleAddCard = useCallback((): void => {
+  const handleAddCard = useCallback(async (): Promise<void> => {
     if (!name) {
       return;
     }
+    const iv = uuidv4().replace(/-/g, "");
+    const fields = { name, ownerName, number, expirationDate, cvv };
+    const encryptedFields = {};
 
+    for (const key in fields) {
+      encryptedFields[key] = await Cryptography.encrypt(fields[key], iv);
+    }
     realm.write(() => {
       return realm.create(Card, {
-        name,
-        ownerName,
-        number,
-        expirationDate,
-        cvv,
         userId: user.id,
+        iv,
+        ...encryptedFields,
       });
     });
 

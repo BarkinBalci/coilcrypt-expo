@@ -3,6 +3,8 @@ import { StyleSheet } from "react-native";
 import { Button, TextInput, Surface, Appbar } from "react-native-paper";
 import { useRealm, useUser } from "@realm/react";
 import { Identity } from "../models/Identity";
+import { Cryptography } from "../libraries/cryptography";
+import { v4 as uuidv4 } from "uuid";
 
 export const AddIdentityScreen: React.FC<{
   navigation: any;
@@ -19,22 +21,22 @@ export const AddIdentityScreen: React.FC<{
   const [email, setEmail] = React.useState("");
   const [phone, setPhone] = React.useState("");
 
-  const handleAddIdentity = useCallback((): void => {
+  const handleAddIdentity = useCallback(async (): Promise<void> => {
     if (!name) {
       return;
     }
+    const iv = uuidv4().replace(/-/g, "");
+    const fields = { name, firstName, middleName, lastName, dateOfBirth, identityNumber, email, phone };
+    const encryptedFields = {};
 
+    for (const key in fields) {
+      encryptedFields[key] = await Cryptography.encrypt(fields[key], iv);
+    }
     realm.write(() => {
       return realm.create(Identity, {
-        name,
-        firstName,
-        middleName,
-        lastName,
-        dateOfBirth,
-        identityNumber,
-        email,
-        phone,
         userId: user.id,
+        iv,
+        ...encryptedFields,
       });
     });
 

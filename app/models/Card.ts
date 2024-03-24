@@ -1,8 +1,8 @@
 import Realm, { BSON } from 'realm';
-
 export class Card extends Realm.Object {
     _id: BSON.ObjectId = new BSON.ObjectId();
     userId!: string;
+    iv: string;
     type: string = 'card';
 
     name!: string;

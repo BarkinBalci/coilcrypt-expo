@@ -64,7 +64,9 @@ export default function Generator() {
             <Text style={{ opacity: 0.6 }} variant="labelSmall">
               Password
             </Text>
-            <Text variant="bodyLarge">{password}</Text>
+            <Text variant="bodyLarge" numberOfLines={1} ellipsizeMode="tail">
+              {password}
+            </Text>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <IconButton icon="refresh" onPress={generatePassword} />
@@ -72,7 +74,7 @@ export default function Generator() {
           </View>
         </View>
         <Divider />
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", paddingTop: 10 }}>
           <Text>Length: {passwordLength}</Text>
           <Slider
             thumbTintColor={paperTheme.colors.primary}
@@ -95,12 +97,10 @@ export default function Generator() {
             <Text>a-z</Text>
             <Switch value={includeLowercase} onValueChange={setIncludeLowercase} />
           </View>
-
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text>0-9</Text>
             <Switch value={includeNumbers} onValueChange={setIncludeNumbers} />
           </View>
-
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text>!@#$%^&*</Text>
             <Switch value={includeSpecials} onValueChange={setIncludeSpecials} />

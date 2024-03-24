@@ -84,7 +84,6 @@ export default function Vault() {
           notes={notes}
           cards={cards}
           identities={identity}
-          onToggleLoginStatus={handleToggleLoginStatus}
           onDeleteItem={handleDeleteItem}
         />
       )}

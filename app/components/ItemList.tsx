@@ -1,13 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, SectionList, Image } from "react-native";
 import { Realm } from "@realm/react";
-import { Card, IconButton, Text, Menu, Surface, Icon } from "react-native-paper";
+import { Card, IconButton, Text, Menu, Surface, Icon, ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { Login } from "../models/Login";
 import { Note } from "../models/Note";
 import { Card as CardModal } from "../models/Card";
 import { Identity } from "../models/Identity";
 import Clipboard from "@react-native-community/clipboard";
+import { Cryptography } from "../libraries/cryptography";
+
+function useDecryptedValue(encryptedValue: string, key: string): string | null {
+  const [decryptedValue, setDecryptedValue] = useState<string | null>(null);
+
+  useEffect(() => {
+    const decryptValue = async () => {
+      const decrypted = await Cryptography.decrypt(encryptedValue, key);
+      setDecryptedValue(decrypted);
+    };
+
+    decryptValue();
+  }, [encryptedValue, key]);
+
+  return decryptedValue;
+}
 
 type ItemListProps = {
   logins: Realm.Results<Login>;
@@ -45,34 +61,59 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
   };
 
   const renderItem = ({ item }) => {
-    switch (item.type) {
+    const [decryptedItem, setDecryptedItem] = useState(null);
+
+    useEffect(() => {
+      const decryptItem = async () => {
+        const decryptedFields = {};
+        for (const key in item) {
+          if (key !== "_id" && key !== "userId" && key !== "iv" && key !== "type" && key !== "createdAt" && key !== "updatedAt" && key !== "favorite" && key !== "repromt" && key !== "passwordHistory") {
+            decryptedFields[key] = await Cryptography.decrypt(item[key], item.iv);
+          } else {
+            decryptedFields[key] = item[key];
+          }
+        }
+        setDecryptedItem({ ...item, ...decryptedFields });
+      };
+
+      decryptItem();
+    }, [item]);
+    if (!decryptedItem) {
+      return <ActivityIndicator style={{ paddingVertical: 15 }} animating={true} />;
+    }
+    switch (decryptedItem.type) {
       case "login":
         return (
-          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: item })}>
+          <Card
+            key={decryptedItem._id.toString()}
+            style={styles.card}
+            mode="contained"
+            onPress={() => navigation.navigate("View Item", { item: decryptedItem })}
+          >
             <Card.Content>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                {imageError[item._id] ? (
+                {imageError[decryptedItem._id] ? (
                   <Icon source="key" size={24} />
                 ) : (
                   <Image
                     style={{ width: 24, height: 24 }}
-                    source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${item.url}` }}
-                    onError={() => handleImageError(item._id.toString())} // Call the new function on error
+                    source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${decryptedItem.url}` }}
+                    onError={() => handleImageError(decryptedItem._id.toString())}
                   />
                 )}
                 <View style={{ marginLeft: 10, flex: 1 }}>
-                  <Text variant="titleSmall">{item.name}</Text>
+                  <Text variant="titleSmall">{decryptedItem.name}</Text>
                   <Text style={{ opacity: 0.6 }} variant="bodySmall">
-                    {item.username}
+                    {decryptedItem.username}
                   </Text>
                 </View>
                 <Menu
-                  visible={visible[item._id]}
+                  visible={visible[decryptedItem._id]}
                   onDismiss={closeMenu}
-                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(item)} size={24} />}
+                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
                 >
                   <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
+                  <Menu.Item onPress={() => onDeleteItem(decryptedItem)} title="Delete" />
                 </Menu>
               </View>
             </Card.Content>
@@ -81,28 +122,25 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
 
       case "note":
         return (
-          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: item })}>
+          <Card
+            key={decryptedItem._id.toString()}
+            style={styles.card}
+            mode="contained"
+            onPress={() => navigation.navigate("View Item", { item: decryptedItem })}
+          >
             <Card.Content>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                {imageError[item._id] ? (
-                  <Icon source="note" size={24} />
-                ) : (
-                  <Image
-                    style={{ width: 24, height: 24 }}
-                    source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${item.url}` }}
-                    onError={() => handleImageError(item._id.toString())} // Call the new function on error
-                  />
-                )}
+                <Icon source="note" size={24} />
                 <Text style={{ marginLeft: 10, paddingVertical: 8, flex: 1 }} variant="titleSmall">
-                  {item.name}
+                  {decryptedItem.name}
                 </Text>
                 <Menu
-                  visible={visible[item._id]}
+                  visible={visible[decryptedItem._id]}
                   onDismiss={closeMenu}
-                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(item)} size={24} />}
+                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
                 >
                   <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
+                  <Menu.Item onPress={() => onDeleteItem(decryptedItem)} title="Delete" />
                 </Menu>
               </View>
             </Card.Content>
@@ -110,31 +148,28 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
         );
       case "card":
         return (
-          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: item })}>
+          <Card
+            key={decryptedItem._id.toString()}
+            style={styles.card}
+            mode="contained"
+            onPress={() => navigation.navigate("View Item", { item: decryptedItem })}
+          >
             <Card.Content>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                {imageError[item._id] ? (
-                  <Icon source="credit-card" size={24} />
-                ) : (
-                  <Image
-                    style={{ width: 24, height: 24 }}
-                    source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${item.url}` }}
-                    onError={() => handleImageError(item._id.toString())} // Call the new function on error
-                  />
-                )}
+                <Icon source="credit-card" size={24} />
                 <View style={{ marginLeft: 10, flex: 1 }}>
-                  <Text variant="titleSmall">{item.name}</Text>
+                  <Text variant="titleSmall">{decryptedItem.name}</Text>
                   <Text style={{ opacity: 0.6 }} variant="bodySmall">
-                    {item.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(item.number.length - 10)).replace(/(.{4})/g, "$1 ")}
+                    {decryptedItem.number}
                   </Text>
                 </View>
                 <Menu
-                  visible={visible[item._id]}
+                  visible={visible[decryptedItem._id]}
                   onDismiss={closeMenu}
-                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(item)} size={24} />}
+                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
                 >
                   <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
+                  <Menu.Item onPress={() => onDeleteItem(decryptedItem)} title="Delete" />
                 </Menu>
               </View>
             </Card.Content>
@@ -142,28 +177,26 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
         );
       case "identity":
         return (
-          <Card key={item._id.toString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: item })}>
+          <Card
+            key={decryptedItem._id.toString()}
+            style={styles.card}
+            mode="contained"
+            onPress={() => navigation.navigate("View Item", { item: decryptedItem })}
+          >
             <Card.Content>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                {imageError[item._id] ? (
-                  <Icon source="account" size={24} />
-                ) : (
-                  <Image
-                    style={{ width: 24, height: 24 }}
-                    source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${item.url}` }}
-                    onError={() => handleImageError(item._id.toString())} // Call the new function on error
-                  />
-                )}
+                <Icon source="account" size={24} />
+
                 <Text style={{ marginLeft: 10, paddingVertical: 8, flex: 1 }} variant="titleSmall">
-                  {item.name}
+                  {decryptedItem.name}
                 </Text>
                 <Menu
-                  visible={visible[item._id]}
+                  visible={visible[decryptedItem._id]}
                   onDismiss={closeMenu}
-                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(item)} size={24} />}
+                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
                 >
                   <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
+                  <Menu.Item onPress={() => onDeleteItem(decryptedItem)} title="Delete" />
                 </Menu>
               </View>
             </Card.Content>

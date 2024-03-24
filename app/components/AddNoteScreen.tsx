@@ -3,6 +3,8 @@ import { StyleSheet } from "react-native";
 import { TextInput, Surface, Appbar } from "react-native-paper";
 import { Note } from "../models/Note";
 import { useRealm, useUser } from "@realm/react";
+import { Cryptography } from "../libraries/cryptography";
+import { v4 as uuidv4 } from "uuid";
 
 export const AddNoteScreen: React.FC<{
   navigation: any;
@@ -13,16 +15,22 @@ export const AddNoteScreen: React.FC<{
   const [content, setDescription] = React.useState("");
   const [name, setTitle] = React.useState("");
 
-  const handleAddNote = useCallback((): void => {
+  const handleAddNote = useCallback(async (): Promise<void> => {
     if (!content || !name) {
       return;
     }
+    const iv = uuidv4().replace(/-/g, "");
+    const fields = { name, content };
+    const encryptedFields = {};
 
+    for (const key in fields) {
+      encryptedFields[key] = await Cryptography.encrypt(fields[key], iv);
+    }
     realm.write(() => {
       return realm.create(Note, {
-        name,
-        content,
         userId: user.id,
+        iv,
+        ...encryptedFields,
       });
     });
 

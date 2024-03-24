@@ -3,6 +3,7 @@ import Realm, { BSON } from 'realm';
 export class Login extends Realm.Object {
     _id: BSON.ObjectId = new BSON.ObjectId();
     userId!: string;
+    iv: string;
     type: string = 'login';
     
     passwordHistory: string[] = [];

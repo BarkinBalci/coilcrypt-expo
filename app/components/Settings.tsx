@@ -11,7 +11,7 @@ export default function Settings() {
       <Appbar.Header>
         <Appbar.Content title="Settings" />
       </Appbar.Header>
-      <Surface elevation={0} style={{ paddingHorizontal:20 }}>
+      <Surface elevation={0} style={{ paddingHorizontal: 20 }}>
         <OfflineModeButton />
         <Button mode="contained" onPress={logOut}>{`Logout ${user?.profile.email}`}</Button>
       </Surface>
