@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Appbar, FAB } from "react-native-paper";
+import { Appbar, Button, FAB, Surface, TextInput } from "react-native-paper";
 import { Login } from "../models/Login";
 import { useQuery } from "@realm/react";
 import { useState } from "react";
@@ -10,6 +10,8 @@ import { useNavigation } from "@react-navigation/native";
 import { Note } from "../models/Note";
 import { Card } from "../models/Card";
 import { Identity } from "../models/Identity";
+import { Cryptography } from "../libraries/cryptography";
+import { View } from "react-native";
 
 export default function Vault() {
   const realm = useRealm();
@@ -20,6 +22,8 @@ export default function Vault() {
   const _handleMore = () => console.log("Shown more");
   const [state, setState] = React.useState({ open: false });
   const onStateChange = ({ open }) => setState({ open });
+  const [encryptionKey, setEncryptionKey] = useState(Cryptography.getEncryptionKey());
+  const [masterPassword, setMasterPassword] = useState("");
   const { open } = state;
   const navigation = useNavigation();
 
@@ -66,60 +70,82 @@ export default function Vault() {
   const cards = useQuery(Card, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")), [
     showDone,
   ]);
-  const identity = useQuery(Identity, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")), [
-    showDone,
-  ]);
+  const identity = useQuery(
+    Identity,
+    (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")),
+    [showDone]
+  );
   return (
     <>
-      <Appbar.Header>
-        <Appbar.Content title="Vault" />
-        <Appbar.Action icon="magnify" onPress={_handleSearch} />
-        <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
-      </Appbar.Header>
-      {logins.length === 0 ? (
-        <IntroText />
+      {encryptionKey === undefined ? (
+        <>
+          <Appbar.Header>
+            <Appbar.Content title="Verify master password" />
+            <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
+          </Appbar.Header>
+          <Surface style={{ padding: 20, flex:1 }}>
+            <TextInput
+              onChangeText={setMasterPassword}
+              value={masterPassword}
+              label={"Master password"}
+              mode="outlined"
+              right={
+                <TextInput.Icon
+                  icon={"send"}
+                  onPress={async () => {
+                    await Cryptography.setEncryptionKey(masterPassword);
+                    setEncryptionKey("Success!");
+                    setMasterPassword("");
+                  }}
+                />
+              }
+            ></TextInput>
+          </Surface>
+        </>
       ) : (
-        <ItemList
-          logins={logins}
-          notes={notes}
-          cards={cards}
-          identities={identity}
-          onDeleteItem={handleDeleteItem}
-        />
+        <>
+          <Appbar.Header>
+            <Appbar.Content title="Vault" />
+            <Appbar.Action icon="magnify" onPress={_handleSearch} />
+            <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
+          </Appbar.Header>
+
+          {logins.length === 0 ? <IntroText /> : <ItemList logins={logins} notes={notes} cards={cards} identities={identity} onDeleteItem={handleDeleteItem} />}
+          <FAB.Group
+            open={open}
+            visible
+            icon={open ? "minus" : "plus"}
+            actions={[
+              {
+                icon: "account",
+                label: "Identity",
+                onPress: () => navigation.navigate("Add Identity"),
+              },
+              {
+                icon: "credit-card",
+                label: "Card",
+                onPress: () => navigation.navigate("Add Card"),
+              },
+              {
+                icon: "note",
+                label: "Note",
+                onPress: () => navigation.navigate("Add Note"),
+              },
+              {
+                icon: "key",
+                label: "Login",
+                onPress: () => navigation.navigate("Add Login"),
+              },
+            ]}
+            onStateChange={onStateChange}
+            onPress={() => {
+              if (open) {
+                // do something if the speed dial is open
+              }
+            }}
+          />
+        </>
       )}
-      <FAB.Group
-        open={open}
-        visible
-        icon={open ? "minus" : "plus"}
-        actions={[
-          {
-            icon: "account",
-            label: "Identity",
-            onPress: () => navigation.navigate("Add Identity"),
-          },
-          {
-            icon: "credit-card",
-            label: "Card",
-            onPress: () => navigation.navigate("Add Card"),
-          },
-          {
-            icon: "note",
-            label: "Note",
-            onPress: () => navigation.navigate("Add Note"),
-          },
-          {
-            icon: "key",
-            label: "Login",
-            onPress: () => navigation.navigate("Add Login"),
-          },
-        ]}
-        onStateChange={onStateChange}
-        onPress={() => {
-          if (open) {
-            // do something if the speed dial is open
-          }
-        }}
-      />
     </>
   );
 }

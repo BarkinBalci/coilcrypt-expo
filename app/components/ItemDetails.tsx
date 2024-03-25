@@ -140,7 +140,7 @@ export default function ItemDetailsScreen({ route }) {
               <Text style={styles.label} variant="labelSmall">
                 Number
               </Text>
-              <Text variant="bodyLarge">{item.number}</Text>
+              <Text variant="bodyLarge">{item.number.replace(/(.{4})/g, "$1 ")}</Text>
             </Surface>
             <IconButton icon="content-copy" onPress={() => copyToClipboard(item.number)} />
           </Surface>

@@ -15,10 +15,10 @@ export class Cryptography {
   }
 
   static async encrypt(data: string, iv: string): Promise<string> {
-    return await Aes.encrypt(data, "86bcfcea9bec19eaf09513752b6b0b074762bab53b3341fb48ebad9d37c6e6d9", iv, "aes-256-cbc");
+    return await Aes.encrypt(data, this.getEncryptionKey(), iv, "aes-256-cbc");
   }
 
   static async decrypt(data: string, iv: string): Promise<string> {
-    return await Aes.decrypt(data, "86bcfcea9bec19eaf09513752b6b0b074762bab53b3341fb48ebad9d37c6e6d9", iv, "aes-256-cbc");
+    return await Aes.decrypt(data, this.getEncryptionKey(), iv, "aes-256-cbc");
   }
 }

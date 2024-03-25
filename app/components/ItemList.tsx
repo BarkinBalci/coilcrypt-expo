@@ -160,7 +160,7 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
                 <View style={{ marginLeft: 10, flex: 1 }}>
                   <Text variant="titleSmall">{decryptedItem.name}</Text>
                   <Text style={{ opacity: 0.6 }} variant="bodySmall">
-                    {decryptedItem.number}
+                    {decryptedItem.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(decryptedItem.number.length - 10)).replace(/(.{4})/g, "$1 ")}
                   </Text>
                 </View>
                 <Menu
