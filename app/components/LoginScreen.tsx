@@ -1,66 +1,87 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { Card, TextInput, Button, Text, MD3DarkTheme, MD3LightTheme, PaperProvider, Surface } from "react-native-paper";
+import { Card, TextInput, Button, Text, Surface } from "react-native-paper";
 import { AuthOperationName, useAuth, useEmailPasswordAuth } from "@realm/react";
-import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
-import { useColorScheme } from "react-native";
+import { Cryptography } from "../libraries/cryptography";
 
 export const LoginScreen = () => {
-  const { theme } = useMaterial3Theme();
-  const colorScheme = useColorScheme();
-  const paperTheme = colorScheme === "dark" ? { ...MD3DarkTheme, colors: theme.dark } : { ...MD3LightTheme, colors: theme.light };
   const { result, logInWithEmailPassword } = useAuth();
   const { register } = useEmailPasswordAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const backgroundColor = paperTheme.colors.background;
-  // Automatically log in after registration
+  const [hashedPassword, setHashedPassword] = useState("");
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
   useEffect(() => {
     if (result.success && result.operation === AuthOperationName.Register) {
-      logInWithEmailPassword({ email, password });
+      logInWithEmailPassword({ email, password: hashedPassword });
     }
-  }, [result, logInWithEmailPassword, email, password]);
+  }, [result, logInWithEmailPassword, email, hashedPassword]);
 
   return (
-      <Surface style={[styles.content]}>
-        <Card mode="contained" style={[styles.card]}>
-          <Card.Content>
-            <TextInput
-              label="Email"
-              value={email}
-              onChangeText={setEmail}
-              autoComplete="email"
-              textContentType="emailAddress"
-              autoCapitalize="none"
-              autoCorrect={false}
-              style={styles.input}
-            />
-            <TextInput
-              label="Password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="password"
-              textContentType="password"
-              style={styles.input}
-            />
+    <Surface style={[styles.content]}>
+      <Card mode="contained" style={[styles.card]}>
+        <Card.Content>
+          <TextInput
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoComplete="email"
+            textContentType="emailAddress"
+            autoCapitalize="none"
+            autoCorrect={false}
+            style={styles.input}
+          />
+          <TextInput
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!isPasswordVisible}
+            autoComplete="password"
+            textContentType="password"
+            style={styles.input}
+            right={<TextInput.Icon icon={isPasswordVisible ? "eye-off" : "eye"} onPress={togglePasswordVisibility} />}
+          />
 
-            {result?.error?.operation === AuthOperationName.LogInWithEmailPassword && (
-              <Text style={styles.errorText}>There was an error logging in, please try again</Text>
-            )}
+          {result?.error?.operation === AuthOperationName.LogInWithEmailPassword &&
+            (console.log(result.error.name),
+            (<Text style={styles.errorText}>{result.error.message || "There was an error logging in, please try again"}</Text>))}
 
-            {result?.error?.operation === AuthOperationName.Register && <Text style={styles.errorText}>There was an error registering, please try again</Text>}
+          {result?.error?.operation === AuthOperationName.Register && (
+            <Text style={styles.errorText}>{result.error.message || "There was an error registering, please try again"}</Text>
+          )}
 
-            <Button mode="contained" onPress={() => logInWithEmailPassword({ email, password })} disabled={result.pending} style={styles.button}>
-              Login
-            </Button>
-
-            <Button mode="contained" onPress={() => register({ email, password })} disabled={result.pending} style={styles.button}>
-              Register
-            </Button>
-          </Card.Content>
-        </Card>
-      </Surface>
+          <Button
+            mode="contained"
+            onPress={async () => {
+              const hashedPassword = await Cryptography.hash(await Cryptography.setEncryptionKey(password, email));
+              setHashedPassword(hashedPassword);
+              logInWithEmailPassword({ email, password: hashedPassword });
+            }}
+            disabled={result.pending}
+            style={styles.button}
+          >
+            Login
+          </Button>
+          <Button
+            mode="contained"
+            onPress={async () => {
+              const hashedPassword = await Cryptography.hash(await Cryptography.setEncryptionKey(password, email));
+              setHashedPassword(hashedPassword);
+              register({ email, password: hashedPassword });
+            }}
+            disabled={result.pending}
+            style={styles.button}
+          >
+            Register
+          </Button>
+        </Card.Content>
+      </Card>
+    </Surface>
   );
 };
 

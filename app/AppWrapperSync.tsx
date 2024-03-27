@@ -22,7 +22,7 @@ export const AppWrapperSync: React.FC<{
       <StatusBar barStyle={colorScheme === "dark" ? "light-content" : "dark-content"} backgroundColor={paperTheme.colors.background} />
       <AppProvider id={appId}>
         <UserProvider fallback={<LoginScreen />}>
-          <RealmProvider 
+          <RealmProvider
             schema={schemas}
             sync={{
               flexible: true,
@@ -31,7 +31,7 @@ export const AppWrapperSync: React.FC<{
               },
             }}
           >
-            <App/>
+            <App />
           </RealmProvider>
         </UserProvider>
       </AppProvider>

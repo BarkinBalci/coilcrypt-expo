@@ -5,6 +5,7 @@ import { Card } from "../models/Card";
 import { useRealm, useUser } from "@realm/react";
 import { Cryptography } from "../libraries/cryptography";
 import { v4 as uuidv4 } from "uuid";
+import TextInputMask from "react-native-text-input-mask";
 
 export const AddCardScreen: React.FC<{
   navigation: any;
@@ -15,6 +16,7 @@ export const AddCardScreen: React.FC<{
   const [name, setTitle] = React.useState("");
   const [ownerName, setOwnerName] = React.useState("");
   const [number, setNumber] = React.useState("");
+  const [formattedNumber, setFormattedNumber] = React.useState("");
   const [expirationDate, setExpirationDate] = React.useState("");
   const [cvv, setCvv] = React.useState("");
 
@@ -50,8 +52,33 @@ export const AddCardScreen: React.FC<{
       <Surface style={styles.content}>
         <TextInput mode="outlined" label="Name" value={name} onChangeText={setTitle} />
         <TextInput mode="outlined" label="Owner Name" value={ownerName} onChangeText={setOwnerName} />
-        <TextInput mode="outlined" label="Number" value={number} onChangeText={setNumber} maxLength={16} />
-        <TextInput mode="outlined" label="Expiration Date" value={expirationDate} onChangeText={setExpirationDate} />
+        <TextInput
+          mode="outlined"
+          label="Number"
+          value={formattedNumber}
+          render={(props) => (
+            <TextInputMask
+              {...props}
+              mask="[0000] [0000] [0000] [0000]"
+              onChangeText={(formatted, extracted) => {
+                setFormattedNumber(formatted);
+                setNumber(extracted);
+              }}
+            />
+          )}
+        />
+        <TextInput
+          mode="outlined"
+          label="Expiration Date"
+          value={expirationDate}
+          onChangeText={setExpirationDate}
+          render={(props) => (
+            <TextInputMask
+              {...props}
+              mask="[00]/[00]"
+            />
+          )}
+        />
         <TextInput multiline mode="outlined" label="CVV" value={cvv} onChangeText={setCvv} maxLength={3} />
       </Surface>
     </Surface>

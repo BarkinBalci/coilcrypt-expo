@@ -10,27 +10,12 @@ import { Identity } from "../models/Identity";
 import Clipboard from "@react-native-community/clipboard";
 import { Cryptography } from "../libraries/cryptography";
 
-function useDecryptedValue(encryptedValue: string, key: string): string | null {
-  const [decryptedValue, setDecryptedValue] = useState<string | null>(null);
-
-  useEffect(() => {
-    const decryptValue = async () => {
-      const decrypted = await Cryptography.decrypt(encryptedValue, key);
-      setDecryptedValue(decrypted);
-    };
-
-    decryptValue();
-  }, [encryptedValue, key]);
-
-  return decryptedValue;
-}
-
 type ItemListProps = {
   logins: Realm.Results<Login>;
   notes: Realm.Results<Note>;
   cards: Realm.Results<CardModal>;
   identities: Realm.Results<Identity>;
-  onDeleteItem: (item: Login | Note) => void;
+  onDeleteItem: (item: any) => void;
 };
 
 export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identities, onDeleteItem }) => {
@@ -56,7 +41,6 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
   };
 
   const handleImageError = (id: string) => {
-    // New function to handle image error
     setImageError((prevState) => ({ ...prevState, [id]: true }));
   };
 
@@ -113,7 +97,7 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
                   anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
                 >
                   <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(decryptedItem)} title="Delete" />
+                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
                 </Menu>
               </View>
             </Card.Content>
@@ -140,7 +124,7 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
                   anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
                 >
                   <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(decryptedItem)} title="Delete" />
+                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
                 </Menu>
               </View>
             </Card.Content>
@@ -160,7 +144,9 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
                 <View style={{ marginLeft: 10, flex: 1 }}>
                   <Text variant="titleSmall">{decryptedItem.name}</Text>
                   <Text style={{ opacity: 0.6 }} variant="bodySmall">
-                    {decryptedItem.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(decryptedItem.number.length - 10)).replace(/(.{4})/g, "$1 ")}
+                    {decryptedItem.number.length >= 10
+                      ? decryptedItem.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(decryptedItem.number.length - 10)).replace(/(.{4})/g, "$1 ")
+                      : decryptedItem.number}
                   </Text>
                 </View>
                 <Menu
@@ -169,7 +155,7 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
                   anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
                 >
                   <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(decryptedItem)} title="Delete" />
+                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
                 </Menu>
               </View>
             </Card.Content>
@@ -196,18 +182,23 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
                   anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
                 >
                   <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(decryptedItem)} title="Delete" />
+                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
                 </Menu>
               </View>
             </Card.Content>
           </Card>
         );
       default:
-        // Default rendering or return null
         return null;
     }
   };
-  const renderSectionHeader = ({ section: { title } }) => <Text>{title}</Text>;
+
+  const renderSectionHeader = ({ section: { title, data } }) => {
+    if (data.length === 0) {
+      return null;
+    }
+    return <Text>{title}</Text>;
+  };
 
   return (
     <Surface style={styles.content}>

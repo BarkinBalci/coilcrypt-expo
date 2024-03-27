@@ -31,13 +31,12 @@ const SearchScreen: React.FC = () => {
 
 export const App: React.FC = () => {
   const realm = useRealm();
-  const [showDone, setShowDone] = useState(false);
-  const logins = useQuery(Login, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")));
-  const notes = useQuery(Note, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")));
-  const cards = useQuery(Card, (collection) => (showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")));
-  const identities = useQuery(Identity, (collection) =>
-    showDone ? collection.sorted("createdAt") : collection.filtered("favorite == false").sorted("createdAt")
-  );
+
+  const logins = useQuery(Login, (collection) => collection.sorted("createdAt"));
+  const notes = useQuery(Note, (collection) => collection.sorted("createdAt"));
+  const cards = useQuery(Card, (collection) => collection.sorted("createdAt"));
+  const identities = useQuery(Identity, (collection) => collection.sorted("createdAt"));
+
   const { theme } = useMaterial3Theme();
   const colorScheme = useColorScheme();
   const paperTheme = colorScheme === "dark" ? { ...MD3DarkTheme, colors: theme.dark } : { ...MD3LightTheme, colors: theme.light };

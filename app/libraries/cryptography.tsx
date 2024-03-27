@@ -1,13 +1,13 @@
 import Aes from "react-native-aes-crypto";
 
 export class Cryptography {
-  private static salt: string = "barkin.balci@gmail.com";
   private static iterations: number = 256000;
   private static keySize: number = 256;
   private static encryptionKey: string;
 
-  static async setEncryptionKey(password: string) {
-    this.encryptionKey = await Aes.pbkdf2(password, this.salt, this.iterations, this.keySize, "sha512");
+  static async setEncryptionKey(password: string, salt: string): Promise<string> {
+    this.encryptionKey = await Aes.pbkdf2(password, salt, this.iterations, this.keySize, "sha512")
+    return (this.encryptionKey);
   }
 
   static getEncryptionKey(): string {
@@ -20,5 +20,9 @@ export class Cryptography {
 
   static async decrypt(data: string, iv: string): Promise<string> {
     return await Aes.decrypt(data, this.getEncryptionKey(), iv, "aes-256-cbc");
+  }
+
+  static hash(data: string): Promise<string> {
+    return Aes.sha512(data);
   }
 }
