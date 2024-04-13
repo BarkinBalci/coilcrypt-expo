@@ -1,4 +1,5 @@
 # Coilcrypt Mobile
+
 <p>
   <!-- iOS -->
   <img alt="Supports Expo iOS" longdesc="Supports Expo iOS" src="https://img.shields.io/badge/iOS-4630EB.svg?style=flat-square&logo=APPLE&labelColor=999999&logoColor=fff" />
@@ -18,30 +19,45 @@ CoilCrypt is a mobile application built with React Native and Expo that allows u
 - Offline Mode: Access your data even when you're offline.
 - Cross-Platform: Works seamlessly on both iOS and Android devices.
 
+<p>
+  <img src="assets/Screenshot_20240413-224558.png" width="200" />
+  <img src="assets/Screenshot_20240413-224622.png" width="200" />
+  <img src="assets/Screenshot_20240413-224632.png" width="200" />
+  <img src="assets\Screenshot_20240413-224605.png" width="200" />
+</p>
+
 ## 🏃 Getting Started
 
 - Build/Run on iOS 🍎
+
 ```
 yarn ios
 ```
+
 ```
 npm run ios
 ```
+
 - Build/Run on Android 🤖
+
 ```
 yarn android
 ```
+
 ```
 npm run android
 ```
+
 ## 💻 Start the Dev Client
 
 ```
 expo start --dev-client
 ```
+
 ```
 yarn start
 ```
+
 ```
 npm run start
 ```

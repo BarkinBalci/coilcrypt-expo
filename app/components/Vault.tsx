@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Appbar, Button, FAB, Surface, TextInput } from "react-native-paper";
+import { Appbar, Button, FAB, Surface, TextInput, Text } from "react-native-paper";
 import { Login } from "../models/Login";
 import { useQuery } from "@realm/react";
 import { useState } from "react";
@@ -54,14 +54,17 @@ export default function Vault() {
             <Appbar.Content title="Verify master password" />
             <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
           </Appbar.Header>
-          <Surface style={{ padding: 20, flex: 1 }}>
+          <Surface style={{ padding: 20, flex: 1, alignItems:"center" }}>
             <TextInput
+              style={{ width: "100%" }}
               onChangeText={setMasterPassword}
               value={masterPassword}
               label={"Master password"}
               mode="outlined"
               right={<TextInput.Icon icon={"send"} onPress={() => handlePassword(masterPassword, user.profile.email)} />}
             ></TextInput>
+            <Text variant="bodySmall">Your vault is locked, verify your master password to continue.</Text>
+            <Text variant="bodySmall">Logged in as {user.profile.email}</Text>
           </Surface>
         </>
       ) : (
