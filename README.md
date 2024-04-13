@@ -1,4 +1,4 @@
-# Expo Template Realm TypeScript
+# Coilcrypt Mobile
 <p>
   <!-- iOS -->
   <img alt="Supports Expo iOS" longdesc="Supports Expo iOS" src="https://img.shields.io/badge/iOS-4630EB.svg?style=flat-square&logo=APPLE&labelColor=999999&logoColor=fff" />
@@ -6,24 +6,20 @@
   <img alt="Supports Expo Android" longdesc="Supports Expo Android" src="https://img.shields.io/badge/Android-4630EB.svg?style=flat-square&logo=ANDROID&labelColor=A4C639&logoColor=fff" />
 </p>
 
-Simple Expo template to quickly get started with Realm.
+CoilCrypt is a mobile application built with React Native and Expo that allows users to securely store and manage their sensitive information, such as login credentials, notes, credit card details, and identities.
 
-## 🚀 How to use
+## 🚀 Features
 
-Use the following command to generate your template:
+Encryption: All data is encrypted using AES-256 with PBKDF2 key derivation, ensuring maximum security for your information.
+Organization: Organize your data into categories like logins, notes, cards, and identities for easy access.
+Favorites: Mark frequently used items as favorites for quick retrieval.
+Password Generator: Generate strong and unique passwords with customizable length and character options.
+Sharing: Share specific items securely with other CoilCrypt users (future feature).
+Offline Mode: Access your data even when you're offline (future feature).
+Cross-Platform: Works seamlessly on both iOS and Android devices.
 
-```
-npx create-expo-app MyAwesomeRealmApp --template @realm/expo-template
-```
+## 🏃 Getting Started
 
-NOTE: version of `npm` before v9 may cause problems when initializing the template.  If the initialization fails, please upgrade to the latest `npm` and try again.
-
-```
-npm install -g npm
-```
-## 🏃 How to build and run locally
-
-- [Setup development Environment](https://reactnative.dev/docs/environment-setup)
 - Build/Run on iOS 🍎
 ```
 yarn ios
@@ -49,17 +45,3 @@ yarn start
 ```
 npm run start
 ```
-
-## 🔀 Setting up sync
-
-See https://github.com/realm/realm-js/blob/master/templates/docs/sync-setup.md for instructions.
-
-## ☁️ Build in the cloud
-
-- [Building with EAS](https://docs.expo.dev/eas/)
-## 📝 Notes
-- [React Native docs](https://reactnative.dev/docs/getting-started)
-- [React Hooks](https://reactjs.org/docs/hooks-intro.html)
-- [Setting Up Realm Sync](https://docs.mongodb.com/realm/sdk/react-native/quick-start/)
-- [Realm JS Documentation](https://docs.mongodb.com/realm/sdk/react-native/)
-- [@realm/react Readme](https://github.com/realm/realm-js/tree/master/packages/realm-react#readme)
