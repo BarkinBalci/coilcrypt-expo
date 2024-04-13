@@ -10,13 +10,13 @@ CoilCrypt is a mobile application built with React Native and Expo that allows u
 
 ## 🚀 Features
 
-Encryption: All data is encrypted using AES-256 with PBKDF2 key derivation, ensuring maximum security for your information.
-Organization: Organize your data into categories like logins, notes, cards, and identities for easy access.
-Favorites: Mark frequently used items as favorites for quick retrieval.
-Password Generator: Generate strong and unique passwords with customizable length and character options.
-Sharing: Share specific items securely with other CoilCrypt users (future feature).
-Offline Mode: Access your data even when you're offline (future feature).
-Cross-Platform: Works seamlessly on both iOS and Android devices.
+- Encryption: All data is encrypted using AES-256 with PBKDF2 key derivation, ensuring maximum security for your information.
+- Organization: Organize your data into categories like logins, notes, cards, and identities for easy access.
+- Favorites: Mark frequently used items as favorites for quick retrieval.
+- Password Generator: Generate strong and unique passwords with customizable length and character options.
+- Sharing: Share specific items securely with other CoilCrypt users (future feature).
+- Offline Mode: Access your data even when you're offline.
+- Cross-Platform: Works seamlessly on both iOS and Android devices.
 
 ## 🏃 Getting Started
 
