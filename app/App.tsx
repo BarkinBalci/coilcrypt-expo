@@ -10,12 +10,12 @@ import { Note } from "./models/Note";
 import { Card } from "./models/Card";
 import { Identity } from "./models/Identity";
 import { useColorScheme } from "react-native";
-import { AddLoginScreen } from "./components/AddLoginScreen";
-import { AddNoteScreen } from "./components/AddNoteScreen";
-import { AddCardScreen } from "./components/AddCardScreen";
 import ItemDetailsScreen from "./components/ItemDetails";
-import { AddIdentityScreen } from "./components/AddIdentityScreen";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
+import { AddCardScreen } from "./components/AddItem";
+import { AddLoginScreen } from "./components/AddItem";
+import { AddNoteScreen } from "./components/AddItem";
+import { AddIdentityScreen } from "./components/AddItem";
 
 enableScreens();
 

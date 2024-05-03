@@ -11,7 +11,7 @@ export default function Generator() {
   const [includeUppercase, setIncludeUppercase] = useState(true);
   const [includeLowercase, setIncludeLowercase] = useState(true);
   const [includeNumbers, setIncludeNumbers] = useState(true);
-  const [password, setPassword] = useState(""); // New state variable for password
+  const [password, setPassword] = useState("");
 
   const { theme } = useMaterial3Theme();
   const colorScheme = useColorScheme();
@@ -75,7 +75,7 @@ export default function Generator() {
         </View>
         <Divider />
         <View style={{ flexDirection: "row", paddingTop: 10 }}>
-          <Text>Length: {passwordLength}</Text>
+          <Text>{passwordLength}</Text>
           <Slider
             thumbTintColor={paperTheme.colors.primary}
             maximumTrackTintColor={paperTheme.colors.primary}

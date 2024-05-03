@@ -41,10 +41,10 @@ export default function Vault() {
     setEncryptionKey(Cryptography.getEncryptionKey());
   };
 
-  const logins = useQuery(Login, (collection) => collection.sorted("createdAt"));
-  const notes = useQuery(Note, (collection) => collection.sorted("createdAt"));
-  const cards = useQuery(Card, (collection) => collection.sorted("createdAt"));
-  const identity = useQuery(Identity, (collection) => collection.sorted("createdAt"));
+  const logins = useQuery(Login, (collection) => collection.sorted("updatedAt"));
+  const notes = useQuery(Note, (collection) => collection.sorted("updatedAt"));
+  const cards = useQuery(Card, (collection) => collection.sorted("updatedAt"));
+  const identity = useQuery(Identity, (collection) => collection.sorted("updatedAt"));
   const items = [...logins, ...notes, ...cards, ...identity];
   return (
     <>
@@ -54,7 +54,7 @@ export default function Vault() {
             <Appbar.Content title="Verify master password" />
             <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
           </Appbar.Header>
-          <Surface style={{ padding: 20, flex: 1, alignItems:"center" }}>
+          <Surface style={{ padding: 20, flex: 1, alignItems: "center" }}>
             <TextInput
               style={{ width: "100%" }}
               onChangeText={setMasterPassword}
@@ -81,6 +81,11 @@ export default function Vault() {
             visible
             icon={open ? "minus" : "plus"}
             actions={[
+              {
+                icon: "plus",
+                label: "Custom",
+                onPress: () => navigation.navigate("Add Custom"),
+              },
               {
                 icon: "account",
                 label: "Identity",
