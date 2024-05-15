@@ -48,8 +48,6 @@ export default function BottomNavigator() {
           getLabelText={({ route }) => {
             const { options } = descriptors[route.key];
             const label = options.tabBarLabel !== undefined ? options.tabBarLabel : options.title !== undefined ? options.title : route.name;
-
-            // Ensure label is a string
             return typeof label === "function" ? "" : label;
           }}
         />
@@ -98,11 +96,3 @@ export default function BottomNavigator() {
     </Tab.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

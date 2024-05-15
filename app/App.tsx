@@ -16,6 +16,7 @@ import { AddCardScreen } from "./components/AddItem";
 import { AddLoginScreen } from "./components/AddItem";
 import { AddNoteScreen } from "./components/AddItem";
 import { AddIdentityScreen } from "./components/AddItem";
+import EditItemScreen from "./components/EditItem";
 
 enableScreens();
 
@@ -96,6 +97,7 @@ export const App: React.FC = () => {
         <Stack.Screen name="Add Note" component={AddNoteScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Add Card" component={AddCardScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Add Identity" component={AddIdentityScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Edit Item" component={EditItemScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

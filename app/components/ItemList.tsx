@@ -72,7 +72,7 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
             key={decryptedItem._id.toString()}
             style={styles.card}
             mode="contained"
-            onPress={() => navigation.navigate("View Item", { item: decryptedItem })}
+            onPress={() => navigation.navigate("View Item", { item: decryptedItem, itemId: decryptedItem._id })}
           >
             <Card.Content>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>

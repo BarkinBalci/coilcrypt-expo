@@ -3,8 +3,8 @@ import { StyleSheet, Linking } from "react-native";
 import Clipboard from "@react-native-community/clipboard";
 import React, { useState } from "react";
 
-export default function ItemDetailsScreen({ route }) {
-  const { item } = route.params;
+export default function ItemDetailsScreen({ route, navigation }) {
+  const { item, itemId } = route.params;
   const [showField, setVisibility] = useState(false);
   const copyToClipboard = (text) => {
     Clipboard.setString(text);
@@ -78,7 +78,7 @@ export default function ItemDetailsScreen({ route }) {
           <Text style={styles.label} variant="labelSmall">
             Created: {new Date(item.createdAt).toLocaleString()}
           </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => console.log("Edit Pressed")} />
+          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("Edit Item", { item: item, model: item.type })} />
         </Surface>
       );
     case "note":
