@@ -2,9 +2,13 @@ import { Divider, FAB, IconButton, Surface, Text } from "react-native-paper";
 import { StyleSheet, Linking } from "react-native";
 import Clipboard from "@react-native-community/clipboard";
 import React, { useState } from "react";
+import { Login } from "../models/Login";
+import { Note } from "../models/Note";
+import { Card } from "../models/Card";
+import { Identity } from "../models/Identity";
 
 export default function ItemDetailsScreen({ route, navigation }) {
-  const { item, itemId } = route.params;
+  const { item } = route.params;
   const [showField, setVisibility] = useState(false);
   const copyToClipboard = (text) => {
     Clipboard.setString(text);
@@ -78,7 +82,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Text style={styles.label} variant="labelSmall">
             Created: {new Date(item.createdAt).toLocaleString()}
           </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("Edit Item", { item: item, model: item.type })} />
+          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("editItem", { item: item })} />
         </Surface>
       );
     case "note":
@@ -109,7 +113,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Text style={styles.label} variant="labelSmall">
             Created: {new Date(item.createdAt).toLocaleString()}
           </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => console.log("Edit Pressed")} />
+          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("editItem", { item: item })} />
         </Surface>
       );
     case "card":
@@ -150,9 +154,9 @@ export default function ItemDetailsScreen({ route, navigation }) {
               <Text style={styles.label} variant="labelSmall">
                 Expiration Date
               </Text>
-              <Text variant="bodyLarge">{item.expirationDate}</Text>
+              <Text variant="bodyLarge">{item.expirationDate.replace(/(\d{2})(\d{2})/, "$1/$2")}</Text>
             </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.expirationDate)} />
+            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.expirationDate.replace(/(\d{2})(\d{2})/, "$1/$2"))} />
           </Surface>
           <Divider />
           <Surface mode="flat" style={styles.surfaceRow}>
@@ -173,7 +177,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Text style={styles.label} variant="labelSmall">
             Created: {new Date(item.createdAt).toLocaleString()}
           </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => console.log("Edit Pressed")} />
+          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("editItem", { item: item })} />
         </Surface>
       );
     case "identity":
@@ -264,7 +268,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Text style={styles.label} variant="labelSmall">
             Created: {new Date(item.createdAt).toLocaleString()}
           </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => console.log("Edit Pressed")} />
+          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("editItem", { item: item })} />
         </Surface>
       );
     default:

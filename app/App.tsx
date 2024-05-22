@@ -12,11 +12,8 @@ import { Identity } from "./models/Identity";
 import { useColorScheme } from "react-native";
 import ItemDetailsScreen from "./components/ItemDetails";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
-import { AddCardScreen } from "./components/AddItem";
-import { AddLoginScreen } from "./components/AddItem";
-import { AddNoteScreen } from "./components/AddItem";
-import { AddIdentityScreen } from "./components/AddItem";
 import EditItemScreen from "./components/EditItem";
+import AddItemScreen from "./components/AddItem";
 
 enableScreens();
 
@@ -93,11 +90,8 @@ export const App: React.FC = () => {
             },
           }}
         />
-        <Stack.Screen name="Add Login" component={AddLoginScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Add Note" component={AddNoteScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Add Card" component={AddCardScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Add Identity" component={AddIdentityScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Edit Item" component={EditItemScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="editItem" component={EditItemScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="addItem" component={AddItemScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

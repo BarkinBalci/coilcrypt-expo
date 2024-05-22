@@ -41,10 +41,10 @@ export default function Vault() {
     setEncryptionKey(Cryptography.getEncryptionKey());
   };
 
-  const logins = useQuery(Login, (collection) => collection.sorted("updatedAt"));
-  const notes = useQuery(Note, (collection) => collection.sorted("updatedAt"));
-  const cards = useQuery(Card, (collection) => collection.sorted("updatedAt"));
-  const identity = useQuery(Identity, (collection) => collection.sorted("updatedAt"));
+  const logins = useQuery(Login, (collection) => collection.sorted("updatedAt", true));
+  const notes = useQuery(Note, (collection) => collection.sorted("updatedAt", true));
+  const cards = useQuery(Card, (collection) => collection.sorted("updatedAt", true));
+  const identity = useQuery(Identity, (collection) => collection.sorted("updatedAt", true));
   const items = [...logins, ...notes, ...cards, ...identity];
   return (
     <>
@@ -84,27 +84,27 @@ export default function Vault() {
               {
                 icon: "plus",
                 label: "Custom",
-                onPress: () => navigation.navigate("Add Custom"),
+                onPress: () => navigation.navigate("addItem", { type: "custom" }),
               },
               {
                 icon: "account",
                 label: "Identity",
-                onPress: () => navigation.navigate("Add Identity"),
+                onPress: () => navigation.navigate("addItem", { type: "identity" }),
               },
               {
                 icon: "credit-card",
                 label: "Card",
-                onPress: () => navigation.navigate("Add Card"),
+                onPress: () => navigation.navigate("addItem", { type: "card" }),
               },
               {
                 icon: "note",
                 label: "Note",
-                onPress: () => navigation.navigate("Add Note"),
+                onPress: () => navigation.navigate("addItem", { type: "note" }),
               },
               {
                 icon: "key",
                 label: "Login",
-                onPress: () => navigation.navigate("Add Login"),
+                onPress: () => navigation.navigate("addItem", { type: "login" }),
               },
             ]}
             onStateChange={onStateChange}
