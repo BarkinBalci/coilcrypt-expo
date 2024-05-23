@@ -4,6 +4,7 @@ import { TextInput, Surface, Appbar } from "react-native-paper";
 import TextInputMask from "react-native-text-input-mask";
 import { useRealm, useUser } from "@realm/react";
 import { Cryptography } from "../libraries/cryptography";
+import { v4 as uuidv4 } from "uuid";
 
 const fieldData = {
   card: {
@@ -52,41 +53,59 @@ const fieldData = {
   },
 };
 
-const EditItemScreen = ({ route, navigation }) => {
+const UpsertItemScreen = ({ navigation, route }) => {
   const realm = useRealm();
   const user = useUser();
-  const { item, model } = route.params;
-  const [formData, setFormData] = useState({ ...item });
+  const { item, type: passedType } = route.params || {};
+  const type = item?.type || passedType || "";
+  const initialFormData = item || {};
+  const [formData, setFormData] = useState(initialFormData);
 
-  const handleEditItem = useCallback(async () => {
-    const currentData = fieldData[item.type];
+  const handleSaveItem = useCallback(async () => {
+    if (!type || !fieldData[type]) {
+      console.error("Invalid item type provided.");
+      // Handle error (e.g., show an error message, navigate back)
+      return;
+    }
+
+    const currentData = fieldData[type];
     const encryptedFields = {};
+    const iv = uuidv4().replace(/-/g, "");
     const excludedFields = ["_id", "userId", "iv", "type", "createdAt", "updatedAt", "favorite", "repromt", "passwordHistory"];
     let updatedItem;
-        
+
     for (const key of currentData.fields) {
-      if (!excludedFields.includes(key)) {
-        encryptedFields[key] = await Cryptography.encrypt(formData[key], item.iv);
+      if (!excludedFields.includes(key) && formData[key] !== "") {
+        encryptedFields[key] = await Cryptography.encrypt(formData[key], item?.iv || iv);
       }
     }
 
-    realm.write(() => {
+    realm.write(async () => {
+      if (item) {
       updatedItem = realm.create(
-        item.type.charAt(0).toUpperCase() + item.type.slice(1),
+        type.charAt(0).toUpperCase() + type.slice(1),
         { _id: item._id, userId: user.id, iv: item.iv, createdAt: item.createdAt, updatedAt: new Date(), ...encryptedFields },
         "modified"
       );
-    });
-    const decryptedFields = {};
-    for (const key in updatedItem) {
-      if (!excludedFields.includes(key)) {
+      const decryptedFields = {};
+      for (const key in updatedItem) {
+        if (!excludedFields.includes(key)) {
         decryptedFields[key] = await Cryptography.decrypt(updatedItem[key], item.iv);
+        }
       }
-    }
-    const decryptedItem = { ...updatedItem, ...decryptedFields };
+      const decryptedItem = { ...updatedItem, ...decryptedFields };
 
-    navigation.navigate("View Item", { item: decryptedItem });
-  }, [realm, navigation, formData, model, item]);
+      navigation.navigate("View Item", { item: decryptedItem });
+      } else {
+      realm.create(type.charAt(0).toUpperCase() + type.slice(1), {
+        userId: user.id,
+        iv: iv,
+        ...encryptedFields,
+      });
+      navigation.goBack();
+      }
+    });
+  }, [realm, navigation, formData, item, type]);
 
   const handleInputChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
@@ -101,7 +120,7 @@ const EditItemScreen = ({ route, navigation }) => {
     };
 
     if (isMasked) {
-      const mask = fieldData[item.type].maskedFields.find((field) => field.key === key).mask;
+      const mask = fieldData[type].maskedFields.find((field) => field.key === key).mask;
       return (
         <TextInput
           {...inputProps}
@@ -117,17 +136,17 @@ const EditItemScreen = ({ route, navigation }) => {
     <Surface style={{ flex: 1 }}>
       <Appbar.Header>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title={`Edit ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}`} />
-        <Appbar.Action icon="content-save" onPress={async () => await handleEditItem()} />
+        <Appbar.Content title={`${item ? "Edit" : "Add"} ${type.charAt(0).toUpperCase() + type.slice(1)}`} />
+        <Appbar.Action icon={item ? "content-save" : "plus"} onPress={handleSaveItem} />
       </Appbar.Header>
 
       <Surface style={styles.content}>
-        {fieldData[item.type].fields.map((key) => (
+        {fieldData[type].fields.map((key) => (
           <React.Fragment key={key}>
             {renderInput(
               key,
-              fieldData[item.type].labels[key],
-              fieldData[item.type].maskedFields?.some((field) => field.key === key)
+              fieldData[type].labels[key],
+              fieldData[type].maskedFields?.some((field) => field.key === key)
             )}
           </React.Fragment>
         ))}
@@ -144,4 +163,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditItemScreen;
+export default UpsertItemScreen;

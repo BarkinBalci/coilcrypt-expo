@@ -10,6 +10,7 @@ import { Identity } from "../models/Identity";
 export default function ItemDetailsScreen({ route, navigation }) {
   const { item } = route.params;
   const [showField, setVisibility] = useState(false);
+  const [showCardNumber, setShowCardNumber] = useState(false);
   const copyToClipboard = (text) => {
     Clipboard.setString(text);
   };
@@ -22,8 +23,19 @@ export default function ItemDetailsScreen({ route, navigation }) {
         console.log("Don't know how to open URI: " + url);
       }
     });
+  };  
+  const toggleCardNumberVisibility = () => {
+    setShowCardNumber(!showCardNumber);
   };
 
+  const formatCardNumber = (number) => {
+    if (!showCardNumber) {
+      // Show first 4 digits, then ** ****, then last 4
+      return `${number.slice(0, 4)} ** **** ${number.slice(-4)}`;
+    }
+    return number.replace(/(.{4})/g, "$1 "); // Show full number with spaces
+  };
+  
   const toggleVisibility = () => {
     setVisibility(!showField);
   };
@@ -82,7 +94,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Text style={styles.label} variant="labelSmall">
             Created: {new Date(item.createdAt).toLocaleString()}
           </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("editItem", { item: item })} />
+          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("upsertItem", { item: item })} />
         </Surface>
       );
     case "note":
@@ -113,7 +125,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Text style={styles.label} variant="labelSmall">
             Created: {new Date(item.createdAt).toLocaleString()}
           </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("editItem", { item: item })} />
+          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("upsertItem", { item: item })} />
         </Surface>
       );
     case "card":
@@ -132,21 +144,14 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Surface mode="flat" style={styles.surfaceRow}>
             <Surface mode="flat">
               <Text style={styles.label} variant="labelSmall">
-                Owner Name
-              </Text>
-              <Text variant="bodyLarge">{item.ownerName}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.ownerName)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
                 Number
               </Text>
-              <Text variant="bodyLarge">{item.number.replace(/(.{4})/g, "$1 ")}</Text>
+              <Text variant="bodyLarge">{formatCardNumber(item.number)}</Text>
             </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.number)} />
+            <Surface mode="flat" style={styles.surfaceRow}>
+              <IconButton icon={showCardNumber ? "eye-off" : "eye"} onPress={toggleCardNumberVisibility} />
+              <IconButton icon="content-copy" onPress={() => copyToClipboard(item.number)} />
+            </Surface>
           </Surface>
           <Divider />
           <Surface mode="flat" style={styles.surfaceRow}>
@@ -177,7 +182,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Text style={styles.label} variant="labelSmall">
             Created: {new Date(item.createdAt).toLocaleString()}
           </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("editItem", { item: item })} />
+          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("upsertItem", { item: item })} />
         </Surface>
       );
     case "identity":
@@ -268,7 +273,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Text style={styles.label} variant="labelSmall">
             Created: {new Date(item.createdAt).toLocaleString()}
           </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("editItem", { item: item })} />
+          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("upsertItem", { item: item })} />
         </Surface>
       );
     default:

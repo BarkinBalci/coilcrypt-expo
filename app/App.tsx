@@ -12,8 +12,7 @@ import { Identity } from "./models/Identity";
 import { useColorScheme } from "react-native";
 import ItemDetailsScreen from "./components/ItemDetails";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
-import EditItemScreen from "./components/EditItem";
-import AddItemScreen from "./components/AddItem";
+import UpsertItemScreen from "./components/UpsertItem";
 
 enableScreens();
 
@@ -90,8 +89,7 @@ export const App: React.FC = () => {
             },
           }}
         />
-        <Stack.Screen name="editItem" component={EditItemScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="addItem" component={AddItemScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="upsertItem" component={UpsertItemScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -84,27 +84,27 @@ export default function Vault() {
               {
                 icon: "plus",
                 label: "Custom",
-                onPress: () => navigation.navigate("addItem", { type: "custom" }),
+                onPress: () => navigation.navigate("upsertItem", { type: "custom" }),
               },
               {
                 icon: "account",
                 label: "Identity",
-                onPress: () => navigation.navigate("addItem", { type: "identity" }),
+                onPress: () => navigation.navigate("upsertItem", { type: "identity" }),
               },
               {
                 icon: "credit-card",
                 label: "Card",
-                onPress: () => navigation.navigate("addItem", { type: "card" }),
+                onPress: () => navigation.navigate("upsertItem", { type: "card" }),
               },
               {
                 icon: "note",
                 label: "Note",
-                onPress: () => navigation.navigate("addItem", { type: "note" }),
+                onPress: () => navigation.navigate("upsertItem", { type: "note" }),
               },
               {
                 icon: "key",
                 label: "Login",
-                onPress: () => navigation.navigate("addItem", { type: "login" }),
+                onPress: () => navigation.navigate("upsertItem", { type: "login" }),
               },
             ]}
             onStateChange={onStateChange}

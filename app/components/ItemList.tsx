@@ -1,40 +1,59 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { View, StyleSheet, SectionList, Image } from "react-native";
 import { Realm } from "@realm/react";
 import { Card, IconButton, Text, Menu, Surface, Icon, ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import Clipboard from "@react-native-community/clipboard";
+
 import { Login } from "../models/Login";
 import { Note } from "../models/Note";
 import { Card as CardModal } from "../models/Card";
 import { Identity } from "../models/Identity";
-import Clipboard from "@react-native-community/clipboard";
 import { Cryptography } from "../libraries/cryptography";
 
-type ItemListProps = {
+type ItemType = Login | Note | CardModal | Identity;
+
+interface Item {
+  _id: string;
+  type: string;
+  name: string;
+  [key: string]: any;
+}
+
+const ItemList: React.FC<{
   logins: Realm.Results<Login>;
   notes: Realm.Results<Note>;
   cards: Realm.Results<CardModal>;
   identities: Realm.Results<Identity>;
-  onDeleteItem: (item: any) => void;
-};
-
-export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identities, onDeleteItem }) => {
+  onDeleteItem: (item: ItemType) => void;
+}> = ({ logins, notes, cards, identities, onDeleteItem }) => {
   const navigation = useNavigation();
   const [visible, setVisible] = useState<Record<string, boolean>>({});
-  const [selectedItem, setSelectedItem] = useState<Login | Note>();
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
 
-  const openMenu = (item: Login | Note) => {
+  const sections = useMemo(
+    () => [
+      { title: "Credentials", data: Array.from(logins) },
+      { title: "Notes", data: Array.from(notes) },
+      { title: "Cards", data: Array.from(cards) },
+      { title: "Identities", data: Array.from(identities) },
+    ],
+    [logins, notes, cards, identities]
+  );
+
+  const openMenu = (item: Item) => {
     setSelectedItem(item);
-    setVisible((prevState) => ({ ...prevState, [item._id.toString()]: true }));
+    setVisible((prevState) => ({ ...prevState, [item._id]: true }));
   };
 
   const closeMenu = () => {
-    setVisible((prevState) => ({ ...prevState, [selectedItem._id.toString()]: false }));
+    setVisible((prevState) => ({ ...prevState, [selectedItem?._id]: false }));
+    setSelectedItem(null);
   };
 
   const copyPassword = () => {
-    if ("password" in selectedItem) {
+    if (selectedItem && "password" in selectedItem) {
       Clipboard.setString(selectedItem.password);
     }
     closeMenu();
@@ -44,174 +63,105 @@ export const ItemList: React.FC<ItemListProps> = ({ logins, notes, cards, identi
     setImageError((prevState) => ({ ...prevState, [id]: true }));
   };
 
-  const renderItem = ({ item }) => {
-    const [decryptedItem, setDecryptedItem] = useState(null);
+  const decryptItem = async (item: ItemType): Promise<Item> => {
+    const decryptedFields = {};
+    for (const key in item) {
+      if (["_id", "userId", "iv", "type", "createdAt", "updatedAt", "favorite", "repromt", "passwordHistory"].includes(key)) {
+        decryptedFields[key] = item[key];
+      } else {
+        decryptedFields[key] = await Cryptography.decrypt(item[key], item.iv);
+      }
+    }
+    return { ...item, ...decryptedFields };
+  };
+
+  const renderItem = ({ item }: { item: ItemType }) => {
+    const [decryptedItem, setDecryptedItem] = useState<Item | null>(null);
 
     useEffect(() => {
-      const decryptItem = async () => {
-        const decryptedFields = {};
-        for (const key in item) {
-          if (key !== "_id" && key !== "userId" && key !== "iv" && key !== "type" && key !== "createdAt" && key !== "updatedAt" && key !== "favorite" && key !== "repromt" && key !== "passwordHistory") {
-            decryptedFields[key] = await Cryptography.decrypt(item[key], item.iv);
-          } else {
-            decryptedFields[key] = item[key];
-          }
-        }
-        setDecryptedItem({ ...item, ...decryptedFields });
-      };
-
-      decryptItem();
+      decryptItem(item).then(setDecryptedItem);
     }, [item]);
+
     if (!decryptedItem) {
       return <ActivityIndicator style={{ paddingVertical: 15 }} animating={true} />;
     }
-    switch (decryptedItem.type) {
+
+    return (
+      <Card key={decryptedItem._id} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: decryptedItem })}>
+        <Card.Content>
+          <View style={styles.itemHeader}>
+            {renderItemIcon(decryptedItem)}
+            {renderItemContent(decryptedItem)}
+            <Menu
+              visible={visible[decryptedItem._id] || false}
+              onDismiss={closeMenu}
+              anchor={<IconButton style={styles.menuButton} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
+            >
+              <Menu.Item onPress={copyPassword} title="Copy" />
+              <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
+            </Menu>
+          </View>
+        </Card.Content>
+      </Card>
+    );
+  };
+
+  const renderItemIcon = (item: Item) => {
+    switch (item.type) {
       case "login":
-        return (
-          <Card
-            key={decryptedItem._id.toString()}
-            style={styles.card}
-            mode="contained"
-            onPress={() => navigation.navigate("View Item", { item: decryptedItem })}
-          >
-            <Card.Content>
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                {imageError[decryptedItem._id] ? (
-                  <Icon source="key" size={24} />
-                ) : (
-                  <Image
-                    style={{ width: 24, height: 24 }}
-                    source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${decryptedItem.url}` }}
-                    onError={() => handleImageError(decryptedItem._id.toString())}
-                  />
-                )}
-                <View style={{ marginLeft: 10, flex: 1 }}>
-                  <Text variant="titleSmall">{decryptedItem.name}</Text>
-                  <Text style={{ opacity: 0.6 }} variant="bodySmall">
-                    {decryptedItem.username}
-                  </Text>
-                </View>
-                <Menu
-                  visible={visible[decryptedItem._id]}
-                  onDismiss={closeMenu}
-                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
-                >
-                  <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
-                </Menu>
-              </View>
-            </Card.Content>
-          </Card>
+        return imageError[item._id] ? (
+          <Icon source="key" size={24} />
+        ) : (
+          <Image
+            style={styles.icon}
+            source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${item.url}` }}
+            onError={() => handleImageError(item._id)}
+          />
         );
-
       case "note":
-        return (
-          <Card
-            key={decryptedItem._id.toString()}
-            style={styles.card}
-            mode="contained"
-            onPress={() => navigation.navigate("View Item", { item: decryptedItem })}
-          >
-            <Card.Content>
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                <Icon source="note" size={24} />
-                <Text style={{ marginLeft: 10, paddingVertical: 8, flex: 1 }} variant="titleSmall">
-                  {decryptedItem.name}
-                </Text>
-                <Menu
-                  visible={visible[decryptedItem._id]}
-                  onDismiss={closeMenu}
-                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
-                >
-                  <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
-                </Menu>
-              </View>
-            </Card.Content>
-          </Card>
-        );
+        return <Icon source="note" size={24} />;
       case "card":
-        return (
-          <Card
-            key={decryptedItem._id.toString()}
-            style={styles.card}
-            mode="contained"
-            onPress={() => navigation.navigate("View Item", { item: decryptedItem })}
-          >
-            <Card.Content>
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                <Icon source="credit-card" size={24} />
-                <View style={{ marginLeft: 10, flex: 1 }}>
-                  <Text variant="titleSmall">{decryptedItem.name}</Text>
-                  <Text style={{ opacity: 0.6 }} variant="bodySmall">
-                    {decryptedItem.number.length >= 10
-                      ? decryptedItem.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(decryptedItem.number.length - 10)).replace(/(.{4})/g, "$1 ")
-                      : decryptedItem.number}
-                  </Text>
-                </View>
-                <Menu
-                  visible={visible[decryptedItem._id]}
-                  onDismiss={closeMenu}
-                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
-                >
-                  <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
-                </Menu>
-              </View>
-            </Card.Content>
-          </Card>
-        );
+        return <Icon source="credit-card" size={24} />;
       case "identity":
-        return (
-          <Card
-            key={decryptedItem._id.toString()}
-            style={styles.card}
-            mode="contained"
-            onPress={() => navigation.navigate("View Item", { item: decryptedItem })}
-          >
-            <Card.Content>
-              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-                <Icon source="account" size={24} />
-
-                <Text style={{ marginLeft: 10, paddingVertical: 8, flex: 1 }} variant="titleSmall">
-                  {decryptedItem.name}
-                </Text>
-                <Menu
-                  visible={visible[decryptedItem._id]}
-                  onDismiss={closeMenu}
-                  anchor={<IconButton style={{ margin: -5 }} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
-                >
-                  <Menu.Item onPress={copyPassword} title="Copy" />
-                  <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
-                </Menu>
-              </View>
-            </Card.Content>
-          </Card>
-        );
+        return <Icon source="account" size={24} />;
       default:
         return null;
     }
   };
 
-  const renderSectionHeader = ({ section: { title, data } }) => {
-    if (data.length === 0) {
-      return null;
+  const renderItemContent = (item: Item) => (
+    <View style={styles.itemContent}>
+      <Text variant="titleSmall">{item.name}</Text>
+      {renderItemSubtitle(item)}
+    </View>
+  );
+
+  const renderItemSubtitle = (item: Item) => {
+    if (item.type === "login") {
+      return <Text style={styles.subtitle}>{item.username}</Text>;
+    } else if (item.type === "card" && item.number) {
+      return (
+        <Text style={styles.subtitle}>
+          {item.number.length >= 10
+            ? item.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(item.number.length - 10)).replace(/(.{4})/g, "$1 ")
+            : item.number}
+        </Text>
+      );
     }
-    return <Text>{title}</Text>;
+    return null;
+  };
+
+  const renderSectionHeader = ({ section: { title, data } }: { section: { title: string; data: Item[] } }) => {
+    return data.length > 0 ? <Text>{title}</Text> : null;
   };
 
   return (
     <Surface style={styles.content}>
       <SectionList
-        sections={[
-          { title: "Credentials", data: Array.from(logins) },
-          { title: "Notes", data: Array.from(notes) },
-          { title: "Cards", data: Array.from(cards) },
-          { title: "Identities", data: Array.from(identities) },
-        ]}
+        sections={sections}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
-        keyExtractor={(login) => login._id.toString()}
+        keyExtractor={(item) => item._id}
         style={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />
@@ -232,6 +182,26 @@ const styles = StyleSheet.create({
   card: {
     marginTop: 6,
     marginBottom: 4,
+  },
+  itemHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  icon: {
+    width: 24,
+    height: 24,
+  },
+  itemContent: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  subtitle: {
+    opacity: 0.6,
+    variant: "bodySmall",
+  },
+  menuButton: {
+    margin: -5,
   },
 });
 
