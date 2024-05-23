@@ -2,18 +2,13 @@ import { Divider, FAB, IconButton, Surface, Text } from "react-native-paper";
 import { StyleSheet, Linking } from "react-native";
 import Clipboard from "@react-native-community/clipboard";
 import React, { useState } from "react";
-import { Login } from "../models/Login";
-import { Note } from "../models/Note";
-import { Card } from "../models/Card";
-import { Identity } from "../models/Identity";
 
 export default function ItemDetailsScreen({ route, navigation }) {
   const { item } = route.params;
   const [showField, setVisibility] = useState(false);
   const [showCardNumber, setShowCardNumber] = useState(false);
-  const copyToClipboard = (text) => {
-    Clipboard.setString(text);
-  };
+
+  const copyToClipboard = (text) => Clipboard.setString(text);
 
   const openURL = (url) => {
     Linking.canOpenURL(url).then((supported) => {
@@ -23,124 +18,75 @@ export default function ItemDetailsScreen({ route, navigation }) {
         console.log("Don't know how to open URI: " + url);
       }
     });
-  };  
-  const toggleCardNumberVisibility = () => {
-    setShowCardNumber(!showCardNumber);
   };
 
+  const toggleVisibility = () => setVisibility(!showField);
+  const toggleCardNumberVisibility = () => setShowCardNumber(!showCardNumber);
+
   const formatCardNumber = (number) => {
-    if (!showCardNumber) {
-      // Show first 4 digits, then ** ****, then last 4
-      return `${number.slice(0, 4)} ** **** ${number.slice(-4)}`;
-    }
-    return number.replace(/(.{4})/g, "$1 "); // Show full number with spaces
+    return showCardNumber
+      ? number.replace(/(.{4})/g, "$1 ") // e.g 1234 5678 1234 5678
+      : `${number.slice(0, 4)} ** **** ${number.slice(-4)}`; // e.g 1234 56** **** 5678
   };
-  
-  const toggleVisibility = () => {
-    setVisibility(!showField);
-  };
+
+  const renderField = (label, value, isSensitive = false, isURL = false) => (
+    <>
+      <Surface mode="flat" style={styles.surfaceRow}>
+        <Surface mode="flat">
+          <Text style={styles.label} variant="labelSmall">
+            {label}
+          </Text>
+          <Text variant="bodyLarge">{isSensitive && !showField ? "••••••••" : value}</Text>
+        </Surface>
+        <Surface mode="flat" style={styles.surfaceRow}>
+          {(isSensitive || isURL) && (
+            <>
+              {isSensitive && <IconButton icon={showField ? "eye-off" : "eye"} onPress={toggleVisibility} />}
+              {isURL && <IconButton icon="web" onPress={() => openURL(value)} />}
+            </>
+          )}
+          <IconButton icon="content-copy" onPress={() => copyToClipboard(value)} />
+        </Surface>
+      </Surface>
+      <Divider />
+    </>
+  );
+
+  const renderCommonFields = () => (
+    <>
+      <Text style={styles.label} variant="labelSmall">
+        Last Updated: {new Date(item.updatedAt).toLocaleString()}
+      </Text>
+      <Text style={styles.label} variant="labelSmall">
+        Created: {new Date(item.createdAt).toLocaleString()}
+      </Text>
+      <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("upsertItem", { item: item })} />
+    </>
+  );
+
   switch (item.type) {
     case "login":
       return (
         <Surface style={styles.surface}>
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Name
-              </Text>
-              <Text variant="bodyLarge">{item.name}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.name)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Username
-              </Text>
-              <Text variant="bodyLarge">{item.username}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.username)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Password
-              </Text>
-              <Text variant="bodyLarge">{showField ? item.password : "••••••••"}</Text>
-            </Surface>
-            <Surface mode="flat" style={styles.surfaceRow}>
-              <IconButton icon={showField ? "eye-off" : "eye"} onPress={toggleVisibility} />
-              <IconButton icon="content-copy" onPress={() => copyToClipboard(item.password)} />
-            </Surface>
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                URL
-              </Text>
-              <Text variant="bodyLarge">{item.url}</Text>
-            </Surface>
-            <Surface mode="flat" style={styles.surfaceRow}>
-              <IconButton icon="web" onPress={() => openURL(item.url)} />
-              <IconButton icon="content-copy" onPress={() => copyToClipboard(item.url)} />
-            </Surface>
-          </Surface>
-          <Text style={styles.label} variant="labelSmall">
-            Last Updated: {new Date(item.updatedAt).toLocaleString()}
-          </Text>
-          <Text style={styles.label} variant="labelSmall">
-            Created: {new Date(item.createdAt).toLocaleString()}
-          </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("upsertItem", { item: item })} />
+          {renderField("Name", item.name)}
+          {renderField("Username", item.username)}
+          {renderField("Password", item.password, true)}
+          {renderField("URL", item.url, false, true)}
+          {renderCommonFields()}
         </Surface>
       );
     case "note":
       return (
         <Surface style={styles.surface}>
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Name
-              </Text>
-              <Text variant="bodyLarge">{item.name}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.name)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Content
-              </Text>
-              <Text variant="bodyLarge">{item.content}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.content)} />
-          </Surface>
-          <Text style={styles.label} variant="labelSmall">
-            Last Updated: {new Date(item.updatedAt).toLocaleString()}
-          </Text>
-          <Text style={styles.label} variant="labelSmall">
-            Created: {new Date(item.createdAt).toLocaleString()}
-          </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("upsertItem", { item: item })} />
+          {renderField("Name", item.name)}
+          {renderField("Content", item.content)}
+          {renderCommonFields()}
         </Surface>
       );
     case "card":
       return (
         <Surface style={styles.surface}>
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Name
-              </Text>
-              <Text variant="bodyLarge">{item.name}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.name)} />
-          </Surface>
-          <Divider />
+          {renderField("Name", item.name)}
           <Surface mode="flat" style={styles.surfaceRow}>
             <Surface mode="flat">
               <Text style={styles.label} variant="labelSmall">
@@ -154,126 +100,23 @@ export default function ItemDetailsScreen({ route, navigation }) {
             </Surface>
           </Surface>
           <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Expiration Date
-              </Text>
-              <Text variant="bodyLarge">{item.expirationDate.replace(/(\d{2})(\d{2})/, "$1/$2")}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.expirationDate.replace(/(\d{2})(\d{2})/, "$1/$2"))} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                CVV
-              </Text>
-              <Text variant="bodyLarge">{showField ? item.cvv : "•••"}</Text>
-            </Surface>
-            <Surface mode="flat" style={styles.surfaceRow}>
-              <IconButton icon={showField ? "eye-off" : "eye"} onPress={toggleVisibility} />
-              <IconButton icon="content-copy" onPress={() => copyToClipboard(item.cvv)} />
-            </Surface>
-          </Surface>
-          <Text style={styles.label} variant="labelSmall">
-            Last Updated: {new Date(item.updatedAt).toLocaleString()}
-          </Text>
-          <Text style={styles.label} variant="labelSmall">
-            Created: {new Date(item.createdAt).toLocaleString()}
-          </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("upsertItem", { item: item })} />
+          {renderField("Expiration Date", item.expirationDate.replace(/(\d{2})(\d{2})/, "$1/$2"))}
+          {renderField("CVV", item.cvv, true)}
+          {renderCommonFields()}
         </Surface>
       );
     case "identity":
       return (
         <Surface style={styles.surface}>
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Name
-              </Text>
-              <Text variant="bodyLarge">{item.name}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.name)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                First Name
-              </Text>
-              <Text variant="bodyLarge">{item.firstName}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.firstName)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Middle Name
-              </Text>
-              <Text variant="bodyLarge">{item.middleName}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.middleName)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Last Name
-              </Text>
-              <Text variant="bodyLarge">{item.lastName}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.lastName)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Date of Birth
-              </Text>
-              <Text variant="bodyLarge">{item.dateOfBirth}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.dateOfBirth)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Identity Number
-              </Text>
-              <Text variant="bodyLarge">{item.identityNumber}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.identityNumber)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Email
-              </Text>
-              <Text variant="bodyLarge">{item.email}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.email)} />
-          </Surface>
-          <Divider />
-          <Surface mode="flat" style={styles.surfaceRow}>
-            <Surface mode="flat">
-              <Text style={styles.label} variant="labelSmall">
-                Phone
-              </Text>
-              <Text variant="bodyLarge">{item.phone}</Text>
-            </Surface>
-            <IconButton icon="content-copy" onPress={() => copyToClipboard(item.phone)} />
-          </Surface>
-          <Text style={styles.label} variant="labelSmall">
-            Last Updated: {new Date(item.updatedAt).toLocaleString()}
-          </Text>
-          <Text style={styles.label} variant="labelSmall">
-            Created: {new Date(item.createdAt).toLocaleString()}
-          </Text>
-          <FAB icon="pen" style={styles.fab} onPress={() => navigation.navigate("upsertItem", { item: item })} />
+          {renderField("Name", item.name)}
+          {renderField("First Name", item.firstName)}
+          {renderField("Middle Name", item.middleName)}
+          {renderField("Last Name", item.lastName)}
+          {renderField("Date of Birth", item.dateOfBirth)}
+          {renderField("Identity Number", item.identityNumber)}
+          {renderField("Email", item.email)}
+          {renderField("Phone", item.phone)}
+          {renderCommonFields()}
         </Surface>
       );
     default:
@@ -297,16 +140,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  surfaceCol: {
-    elevation: 0,
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
   label: {
     opacity: 0.6,
   },
-
   fab: {
     position: "absolute",
     margin: 16,
