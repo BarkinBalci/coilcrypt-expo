@@ -65,8 +65,9 @@ const ItemList: React.FC<{
 
   const decryptItem = async (item: ItemType): Promise<Item> => {
     const decryptedFields = {};
+    const excludedFields = ["_id", "userId", "iv", "type", "createdAt", "updatedAt", "favorite", "repromt", "passwordHistory"];
     for (const key in item) {
-      if (["_id", "userId", "iv", "type", "createdAt", "updatedAt", "favorite", "repromt", "passwordHistory"].includes(key)) {
+      if (excludedFields.includes(key)) {
         decryptedFields[key] = item[key];
       } else {
         decryptedFields[key] = await Cryptography.decrypt(item[key], item.iv);
@@ -87,7 +88,7 @@ const ItemList: React.FC<{
     }
 
     return (
-      <Card key={decryptedItem._id} style={styles.card} mode="contained" onPress={() => navigation.navigate("View Item", { item: decryptedItem })}>
+      <Card key={decryptedItem._id} style={styles.card} mode="contained" onPress={() => navigation.navigate("viewItem", { item: decryptedItem })}>
         <Card.Content>
           <View style={styles.itemHeader}>
             {renderItemIcon(decryptedItem)}

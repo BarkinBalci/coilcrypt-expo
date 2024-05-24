@@ -75,7 +75,7 @@ export const App: React.FC = () => {
           }}
         />
         <Stack.Screen
-          name="View Item"
+          name="viewItem"
           component={ItemDetailsScreen}
           options={{
             header: () => {
