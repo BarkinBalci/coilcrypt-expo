@@ -26,7 +26,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
   const formatCardNumber = (number) => {
     return showCardNumber
       ? number.replace(/(.{4})/g, "$1 ") // e.g 1234 5678 1234 5678
-      : `${number.slice(0, 4)} ** **** ${number.slice(-4)}`; // e.g 1234 56** **** 5678
+      : `${number.slice(0, 4)} •• •••• ${number.slice(-4)}`; // e.g 1234 56** **** 5678
   };
 
   const renderField = (label, value, isSensitive = false, isURL = false) => (
@@ -36,7 +36,7 @@ export default function ItemDetailsScreen({ route, navigation }) {
           <Text style={styles.label} variant="labelSmall">
             {label}
           </Text>
-          <Text variant="bodyLarge">{isSensitive && !showField ? "••••••••" : value}</Text>
+          <Text variant="bodyLarge">{isSensitive && !showField ? "•••" : value}</Text>
         </Surface>
         <Surface mode="flat" style={styles.surfaceRow}>
           {(isSensitive || isURL) && (
