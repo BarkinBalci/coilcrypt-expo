@@ -4,28 +4,15 @@ import { Realm } from "@realm/react";
 import { Card, IconButton, Text, Menu, Surface, Icon, ActivityIndicator } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import Clipboard from "@react-native-community/clipboard";
-
-import { Login } from "../models/Login";
-import { Note } from "../models/Note";
-import { Card as CardModal } from "../models/Card";
-import { Identity } from "../models/Identity";
 import { Cryptography } from "../libraries/cryptography";
-
-type ItemType = Login | Note | CardModal | Identity;
-
-interface Item {
-  _id: string;
-  type: string;
-  name: string;
-  [key: string]: any;
-}
+import { Login, Note, Card as CardModel, Identity, Item } from "../models";
 
 const ItemList: React.FC<{
-  logins: Realm.Results<Login>;
-  notes: Realm.Results<Note>;
-  cards: Realm.Results<CardModal>;
-  identities: Realm.Results<Identity>;
-  onDeleteItem: (item: ItemType) => void;
+  logins: Realm.Results<Login & { type: "login" }>;
+  notes: Realm.Results<Note & { type: "note" }>;
+  cards: Realm.Results<CardModel & { type: "card" }>;
+  identities: Realm.Results<Identity & { type: "identity" }>;
+  onDeleteItem: (item: Login | Note | CardModel | Identity) => void;
 }> = ({ logins, notes, cards, identities, onDeleteItem }) => {
   const navigation = useNavigation();
   const [visible, setVisible] = useState<Record<string, boolean>>({});
@@ -44,16 +31,19 @@ const ItemList: React.FC<{
 
   const openMenu = (item: Item) => {
     setSelectedItem(item);
-    setVisible((prevState) => ({ ...prevState, [item._id]: true }));
+    setVisible((prevState) => ({ ...prevState, [item._id.toHexString()]: true }));
   };
 
   const closeMenu = () => {
-    setVisible((prevState) => ({ ...prevState, [selectedItem?._id]: false }));
+    setVisible((prevState) => ({
+      ...prevState,
+      [selectedItem?._id.toHexString()]: false,
+    }));
     setSelectedItem(null);
   };
 
   const copyPassword = () => {
-    if (selectedItem && "password" in selectedItem) {
+    if (selectedItem?.type === "login" && selectedItem.password) {
       Clipboard.setString(selectedItem.password);
     }
     closeMenu();
@@ -63,20 +53,35 @@ const ItemList: React.FC<{
     setImageError((prevState) => ({ ...prevState, [id]: true }));
   };
 
-  const decryptItem = async (item: ItemType): Promise<Item> => {
-    const decryptedFields = {};
-    const excludedFields = ["_id", "userId", "iv", "type", "createdAt", "updatedAt", "favorite", "repromt", "passwordHistory"];
+  const decryptItem = async (item: Item): Promise<Item> => {
+    const excludedFields = [
+      "_id",
+      "userId",
+      "iv",
+      "createdAt",
+      "updatedAt",
+      "favorite",
+      "repromt",
+      "passwordHistory",
+      "type",
+    ];
+
+    const decryptedFields = {} as any; // Use a type assertion here
+
     for (const key in item) {
       if (excludedFields.includes(key)) {
         decryptedFields[key] = item[key];
-      } else {
+      } else if (item.iv) {
+        // Only attempt decryption if 'iv' exists
         decryptedFields[key] = await Cryptography.decrypt(item[key], item.iv);
+      } else {
+        decryptedFields[key] = item[key];
       }
     }
     return { ...item, ...decryptedFields };
   };
 
-  const renderItem = ({ item }: { item: ItemType }) => {
+  const renderItem = ({ item }: { item: Item }) => {
     const [decryptedItem, setDecryptedItem] = useState<Item | null>(null);
 
     useEffect(() => {
@@ -88,17 +93,18 @@ const ItemList: React.FC<{
     }
 
     return (
-      <Card key={decryptedItem._id} style={styles.card} mode="contained" onPress={() => navigation.navigate("viewItem", { item: decryptedItem })}>
+      <Card key={decryptedItem._id.toHexString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("viewItem", { item: decryptedItem })}>
         <Card.Content>
           <View style={styles.itemHeader}>
             {renderItemIcon(decryptedItem)}
             {renderItemContent(decryptedItem)}
             <Menu
-              visible={visible[decryptedItem._id] || false}
+              visible={visible[decryptedItem._id.toHexString()] || false}
               onDismiss={closeMenu}
               anchor={<IconButton style={styles.menuButton} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
             >
-              <Menu.Item onPress={copyPassword} title="Copy" />
+              {/* Conditionally render Copy option */}
+              {decryptedItem.type === "login" && <Menu.Item onPress={copyPassword} title="Copy" />}
               <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
             </Menu>
           </View>
@@ -110,13 +116,15 @@ const ItemList: React.FC<{
   const renderItemIcon = (item: Item) => {
     switch (item.type) {
       case "login":
-        return imageError[item._id] ? (
+        return imageError[item._id.toHexString()] ? (
           <Icon source="key" size={24} />
         ) : (
           <Image
             style={styles.icon}
-            source={{ uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${item.url}` }}
-            onError={() => handleImageError(item._id)}
+            source={{
+              uri: `https://www.google.com/s2/favicons?sz=64&domain_url=${item.url}`,
+            }}
+            onError={() => handleImageError(item._id.toHexString())}
           />
         );
       case "note":
@@ -124,9 +132,8 @@ const ItemList: React.FC<{
       case "card":
         return <Icon source="credit-card" size={24} />;
       case "identity":
-        return <Icon source="account" size={24} />;
       default:
-        return null;
+        return <Icon source="account" size={24} />;
     }
   };
 
@@ -138,18 +145,20 @@ const ItemList: React.FC<{
   );
 
   const renderItemSubtitle = (item: Item) => {
-    if (item.type === "login") {
-      return <Text style={styles.subtitle}>{item.username}</Text>;
-    } else if (item.type === "card" && item.number) {
-      return (
-        <Text style={styles.subtitle}>
-          {item.number.length >= 10
-            ? item.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(item.number.length - 10)).replace(/(.{4})/g, "$1 ")
-            : item.number}
-        </Text>
-      );
+    switch (item.type) {
+      case "login":
+        return <Text style={styles.subtitle}>{item.username}</Text>;
+      case "card":
+        return item.number ? (
+          <Text style={styles.subtitle}>
+            {item.number.length >= 10
+              ? item.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(item.number.length - 10)).replace(/(.{4})/g, "$1 ")
+              : item.number}
+          </Text>
+        ) : null;
+      default:
+        return null;
     }
-    return null;
   };
 
   const renderSectionHeader = ({ section: { title, data } }: { section: { title: string; data: Item[] } }) => {
@@ -162,7 +171,7 @@ const ItemList: React.FC<{
         sections={sections}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
-        keyExtractor={(item) => item._id}
+        keyExtractor={(item) => item._id.toHexString()}
         style={styles.listContainer}
         showsVerticalScrollIndicator={false}
       />

@@ -2,9 +2,10 @@ import { Divider, FAB, IconButton, Surface, Text } from "react-native-paper";
 import { StyleSheet, Linking } from "react-native";
 import Clipboard from "@react-native-community/clipboard";
 import React, { useState } from "react";
+import { Item } from "../models";
 
 export default function ItemDetailsScreen({ route, navigation }) {
-  const { item } = route.params;
+  const { item }: { item: Item } = route.params;
   const [showField, setVisibility] = useState(false);
   const [showCardNumber, setShowCardNumber] = useState(false);
 

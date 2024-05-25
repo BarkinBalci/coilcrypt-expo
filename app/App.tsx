@@ -5,14 +5,12 @@ import BottomNavigator from "./components/BottomNavigator";
 import { NavigationContainer, DefaultTheme, useNavigation } from "@react-navigation/native";
 import { createStackNavigator, CardStyleInterpolators } from "@react-navigation/stack";
 import { enableScreens } from "react-native-screens";
-import { Login } from "./models/Login";
-import { Note } from "./models/Note";
-import { Card } from "./models/Card";
-import { Identity } from "./models/Identity";
 import { useColorScheme } from "react-native";
 import ItemDetailsScreen from "./components/ItemDetails";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
 import UpsertItemScreen from "./components/UpsertItem";
+import { Login, Note, Card, Identity } from "./models";
+
 
 enableScreens();
 

@@ -1,15 +1,12 @@
 import React, { useCallback } from "react";
 import { Appbar, Button, FAB, Surface, TextInput, Text } from "react-native-paper";
-import { Login } from "../models/Login";
 import { useQuery } from "@realm/react";
 import { useState } from "react";
 import ItemList from "./ItemList";
 import { useRealm, useUser } from "@realm/react";
 import { IntroText } from "./IntroText";
 import { useNavigation } from "@react-navigation/native";
-import { Note } from "../models/Note";
-import { Card } from "../models/Card";
-import { Identity } from "../models/Identity";
+import { Login, Note, Card, Identity } from "../models/";
 import { Cryptography } from "../libraries/cryptography";
 
 export default function Vault() {

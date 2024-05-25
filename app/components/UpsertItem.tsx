@@ -5,6 +5,7 @@ import TextInputMask from "react-native-text-input-mask";
 import { useRealm, useUser } from "@realm/react";
 import { Cryptography } from "../libraries/cryptography";
 import { v4 as uuidv4 } from "uuid";
+import { Item } from "../models";
 
 const fieldData = {
   card: {
@@ -56,7 +57,7 @@ const fieldData = {
 const UpsertItemScreen = ({ navigation, route }) => {
   const realm = useRealm();
   const user = useUser();
-  const { item, type: passedType } = route.params || {};
+  const { item, type: passedType } = (route.params as { item: Item; type: string }) || {};
   const type = item?.type || passedType || "";
   const initialFormData = item || {};
   const [formData, setFormData] = useState(initialFormData);
@@ -82,27 +83,27 @@ const UpsertItemScreen = ({ navigation, route }) => {
 
     realm.write(async () => {
       if (item) {
-      updatedItem = realm.create(
-        type.charAt(0).toUpperCase() + type.slice(1),
-        { _id: item._id, userId: user.id, iv: item.iv, createdAt: item.createdAt, updatedAt: new Date(), ...encryptedFields },
-        "modified"
-      );
-      const decryptedFields = {};
-      for (const key in updatedItem) {
-        if (!excludedFields.includes(key)) {
-        decryptedFields[key] = await Cryptography.decrypt(updatedItem[key], item.iv);
+        updatedItem = realm.create(
+          type.charAt(0).toUpperCase() + type.slice(1),
+          { _id: item._id, userId: user.id, iv: item.iv, createdAt: item.createdAt, updatedAt: new Date(), ...encryptedFields },
+          "modified"
+        );
+        const decryptedFields = {};
+        for (const key in updatedItem) {
+          if (!excludedFields.includes(key)) {
+            decryptedFields[key] = await Cryptography.decrypt(updatedItem[key], item.iv);
+          }
         }
-      }
-      const decryptedItem = { ...updatedItem, ...decryptedFields };
+        const decryptedItem = { ...updatedItem, ...decryptedFields };
 
-      navigation.navigate("viewItem", { item: decryptedItem });
+        navigation.navigate("viewItem", { item: decryptedItem });
       } else {
-      realm.create(type.charAt(0).toUpperCase() + type.slice(1), {
-        userId: user.id,
-        iv: iv,
-        ...encryptedFields,
-      });
-      navigation.goBack();
+        realm.create(type.charAt(0).toUpperCase() + type.slice(1), {
+          userId: user.id,
+          iv: iv,
+          ...encryptedFields,
+        });
+        navigation.goBack();
       }
     });
   }, [realm, navigation, formData, item, type]);
