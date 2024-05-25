@@ -75,7 +75,7 @@ const UpsertItemScreen = ({ navigation, route }) => {
     let updatedItem;
 
     for (const key of currentData.fields) {
-      if (!excludedFields.includes(key) && formData[key] !== "") {
+      if (!excludedFields.includes(key)) {
         encryptedFields[key] = await Cryptography.encrypt(formData[key], item?.iv || iv);
       }
     }
@@ -95,7 +95,7 @@ const UpsertItemScreen = ({ navigation, route }) => {
       }
       const decryptedItem = { ...updatedItem, ...decryptedFields };
 
-      navigation.navigate("View Item", { item: decryptedItem });
+      navigation.navigate("viewItem", { item: decryptedItem });
       } else {
       realm.create(type.charAt(0).toUpperCase() + type.slice(1), {
         userId: user.id,

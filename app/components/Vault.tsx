@@ -44,8 +44,8 @@ export default function Vault() {
   const logins = useQuery(Login, (collection) => collection.sorted("updatedAt", true));
   const notes = useQuery(Note, (collection) => collection.sorted("updatedAt", true));
   const cards = useQuery(Card, (collection) => collection.sorted("updatedAt", true));
-  const identity = useQuery(Identity, (collection) => collection.sorted("updatedAt", true));
-  const items = [...logins, ...notes, ...cards, ...identity];
+  const identities = useQuery(Identity, (collection) => collection.sorted("updatedAt", true));
+  const items = [...logins, ...notes, ...cards, ...identities];
   return (
     <>
       {encryptionKey === undefined ? (
@@ -75,7 +75,7 @@ export default function Vault() {
             <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
           </Appbar.Header>
 
-          {items.length === 0 ? <IntroText /> : <ItemList logins={logins} notes={notes} cards={cards} identities={identity} onDeleteItem={handleDeleteItem} />}
+          {items.length === 0 ? <IntroText /> : <ItemList logins={logins} notes={notes} cards={cards} identities={identities} onDeleteItem={handleDeleteItem} />}
           <FAB.Group
             open={open}
             visible
