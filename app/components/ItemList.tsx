@@ -8,23 +8,26 @@ import { Cryptography } from "../libraries/cryptography";
 import { Login, Note, Card as CardModel, Identity, Item } from "../models";
 
 const ItemList: React.FC<{
-  logins: Realm.Results<Login & { type: "login" }>;
-  notes: Realm.Results<Note & { type: "note" }>;
-  cards: Realm.Results<CardModel & { type: "card" }>;
-  identities: Realm.Results<Identity & { type: "identity" }>;
+  logins: Realm.Results<Login>;
+  notes: Realm.Results<Note>;
+  cards: Realm.Results<CardModel>;
+  identities: Realm.Results<Identity>;
   onDeleteItem: (item: Item) => void;
 }> = ({ logins, notes, cards, identities, onDeleteItem }) => {
-  const navigation = useNavigation();
+
+  //TODO FIX ANY
+  const navigation = useNavigation() as any;
+  
   const [visible, setVisible] = useState<Record<string, boolean>>({});
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
 
   const sections = useMemo(
     () => [
-      { title: "Credentials", data: Array.from(logins) },
-      { title: "Notes", data: Array.from(notes) },
-      { title: "Cards", data: Array.from(cards) },
-      { title: "Identities", data: Array.from(identities) },
+      { title: "Logins", data: Array.from(logins) as Item[] },
+      { title: "Notes", data: Array.from(notes) as Item[] },
+      { title: "Cards", data: Array.from(cards) as Item[] },
+      { title: "Identities", data: Array.from(identities) as Item[] },
     ],
     [logins, notes, cards, identities]
   );
@@ -43,7 +46,7 @@ const ItemList: React.FC<{
   };
 
   const copyPassword = () => {
-    if (selectedItem?.type === "login" && selectedItem.password) {
+    if (selectedItem && 'password' in selectedItem) { 
       Clipboard.setString(selectedItem.password);
     }
     closeMenu();
@@ -93,7 +96,7 @@ const ItemList: React.FC<{
     }
 
     return (
-      <Card key={decryptedItem._id.toHexString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("viewItem", { item: decryptedItem })}>
+      <Card key={decryptedItem._id.toHexString()} style={styles.card} mode="contained" onPress={() => navigation.navigate("viewItem", { item: decryptedItem })} >
         <Card.Content>
           <View style={styles.itemHeader}>
             {renderItemIcon(decryptedItem)}
@@ -104,7 +107,7 @@ const ItemList: React.FC<{
               anchor={<IconButton style={styles.menuButton} icon="dots-vertical" onPress={() => openMenu(decryptedItem)} size={24} />}
             >
               {/* Conditionally render Copy option */}
-              {decryptedItem.type === "login" && <Menu.Item onPress={copyPassword} title="Copy" />}
+              { 'password' in decryptedItem && <Menu.Item onPress={copyPassword} title="Copy" />}
               <Menu.Item onPress={() => onDeleteItem(item)} title="Delete" />
             </Menu>
           </View>
@@ -149,7 +152,7 @@ const ItemList: React.FC<{
       case "login":
         return <Text style={styles.subtitle}>{item.username}</Text>;
       case "card":
-        return item.number ? (
+        return 'number' in item && item.number ? (
           <Text style={styles.subtitle}>
             {item.number.length >= 10
               ? item.number.replace(/(\d{6})(\d+)(?=\d{4})/g, "$1" + "*".repeat(item.number.length - 10)).replace(/(.{4})/g, "$1 ")

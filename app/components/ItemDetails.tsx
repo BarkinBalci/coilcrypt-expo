@@ -1,5 +1,5 @@
 import { Divider, FAB, IconButton, Surface, Text } from "react-native-paper";
-import { StyleSheet, Linking } from "react-native";
+import { StyleSheet, Linking, View } from "react-native";
 import Clipboard from "@react-native-community/clipboard";
 import React, { useState } from "react";
 import { Item } from "../models";
@@ -9,9 +9,9 @@ export default function ItemDetailsScreen({ route, navigation }) {
   const [showField, setVisibility] = useState(false);
   const [showCardNumber, setShowCardNumber] = useState(false);
 
-  const copyToClipboard = (text) => Clipboard.setString(text);
+  const copyToClipboard = (text: string) => Clipboard.setString(text);
 
-  const openURL = (url) => {
+  const openURL = (url: string) => {
     Linking.canOpenURL(url).then((supported) => {
       if (supported) {
         Linking.openURL(url);
@@ -24,21 +24,23 @@ export default function ItemDetailsScreen({ route, navigation }) {
   const toggleVisibility = () => setVisibility(!showField);
   const toggleCardNumberVisibility = () => setShowCardNumber(!showCardNumber);
 
-  const formatCardNumber = (number) => {
+  const formatCardNumber = (number: string) => {
     return showCardNumber
       ? number.replace(/(.{4})/g, "$1 ") // e.g 1234 5678 1234 5678
       : `${number.slice(0, 4)} •• •••• ${number.slice(-4)}`; // e.g 1234 56** **** 5678
   };
 
-  const renderField = (label, value, isSensitive = false, isURL = false) => (
+  const renderField = (label: string, value: string, isSensitive = false, isURL = false) => (
     <>
       <Surface mode="flat" style={styles.surfaceRow}>
-        <Surface mode="flat">
-          <Text style={styles.label} variant="labelSmall">
-            {label}
-          </Text>
-          <Text variant="bodyLarge">{isSensitive && !showField ? "•••" : value}</Text>
-        </Surface>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.label} variant="labelSmall">
+              {label}
+            </Text>
+            <Text numberOfLines={1} ellipsizeMode="tail" variant="bodyLarge">
+              {isSensitive && !showField ? "•".repeat(value.length) : value}
+            </Text>
+          </View>
         <Surface mode="flat" style={styles.surfaceRow}>
           {(isSensitive || isURL) && (
             <>

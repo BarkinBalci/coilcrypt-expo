@@ -86,7 +86,7 @@ const UpsertItemScreen = ({ navigation, route }) => {
         updatedItem = realm.create(
           type.charAt(0).toUpperCase() + type.slice(1),
           { _id: item._id, userId: user.id, iv: item.iv, createdAt: item.createdAt, updatedAt: new Date(), ...encryptedFields },
-          "modified"
+          true
         );
         const decryptedFields = {};
         for (const key in updatedItem) {
@@ -114,7 +114,6 @@ const UpsertItemScreen = ({ navigation, route }) => {
 
   const renderInput = (key, label, isMasked = false) => {
     const inputProps = {
-      mode: "outlined",
       label,
       value: formData[key] || "",
       onChangeText: (value) => handleInputChange(key, value),
@@ -124,12 +123,13 @@ const UpsertItemScreen = ({ navigation, route }) => {
       const mask = fieldData[type].maskedFields.find((field) => field.key === key).mask;
       return (
         <TextInput
+          mode="outlined"
           {...inputProps}
           render={(props) => <TextInputMask {...props} mask={mask} onChangeText={(formatted, extracted) => handleInputChange(key, extracted)} />}
         />
       );
     } else {
-      return <TextInput {...inputProps} />;
+      return <TextInput mode="outlined" {...inputProps} />;
     }
   };
 

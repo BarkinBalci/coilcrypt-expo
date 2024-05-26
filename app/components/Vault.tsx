@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Appbar, Button, FAB, Surface, TextInput, Text } from "react-native-paper";
+import { Appbar, FAB, Surface, TextInput, Text } from "react-native-paper";
 import { useQuery } from "@realm/react";
 import { useState } from "react";
 import ItemList from "./ItemList";
@@ -22,7 +22,9 @@ export default function Vault() {
   const [masterPassword, setMasterPassword] = useState("");
   const user = useUser();
   const { open } = state;
-  const navigation = useNavigation();
+  
+  //TODO FIX ANY
+  const navigation = useNavigation() as any;
 
   const handleDeleteItem = useCallback(
     (item: Realm.Object): void => {
@@ -72,7 +74,11 @@ export default function Vault() {
             <Appbar.Action icon="dots-vertical" onPress={_handleMore} />
           </Appbar.Header>
 
-          {items.length === 0 ? <IntroText /> : <ItemList logins={logins} notes={notes} cards={cards} identities={identities} onDeleteItem={handleDeleteItem} />}
+          {items.length === 0 ? (
+            <IntroText />
+          ) : (
+            <ItemList logins={logins} notes={notes} cards={cards} identities={identities} onDeleteItem={handleDeleteItem} />
+          )}
           <FAB.Group
             open={open}
             visible
