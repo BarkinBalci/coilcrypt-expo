@@ -12,7 +12,7 @@ const ItemList: React.FC<{
   notes: Realm.Results<Note & { type: "note" }>;
   cards: Realm.Results<CardModel & { type: "card" }>;
   identities: Realm.Results<Identity & { type: "identity" }>;
-  onDeleteItem: (item: Login | Note | CardModel | Identity) => void;
+  onDeleteItem: (item: Item) => void;
 }> = ({ logins, notes, cards, identities, onDeleteItem }) => {
   const navigation = useNavigation();
   const [visible, setVisible] = useState<Record<string, boolean>>({});
@@ -66,7 +66,7 @@ const ItemList: React.FC<{
       "type",
     ];
 
-    const decryptedFields = {} as any; // Use a type assertion here
+    const decryptedFields = {} as any;
 
     for (const key in item) {
       if (excludedFields.includes(key)) {
